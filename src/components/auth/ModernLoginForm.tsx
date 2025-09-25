@@ -152,7 +152,7 @@ export function ModernLoginForm() {
   // Show redirecting state
   if (isRedirecting) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -171,7 +171,7 @@ export function ModernLoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-white py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
         <AnimatePresence mode="wait">
           {currentView === 'login' && (
@@ -188,7 +188,7 @@ export function ModernLoginForm() {
                     initial={{ scale: 0.9 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1 }}
-                    className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                    className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4"
                   >
                     <Lock className="w-8 h-8 text-white" />
                   </motion.div>
@@ -289,7 +289,7 @@ export function ModernLoginForm() {
                     <Button
                       type="submit"
                       disabled={isSubmitting || state.isLoading || isRedirecting}
-                      className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                      className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       {isSubmitting || state.isLoading || isRedirecting ? (
                         <>
@@ -336,7 +336,7 @@ export function ModernLoginForm() {
                     initial={{ scale: 0.9 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1 }}
-                    className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                    className="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4"
                   >
                     <Mail className="w-8 h-8 text-white" />
                   </motion.div>
@@ -386,7 +386,7 @@ export function ModernLoginForm() {
                     <Button
                       type="submit"
                       disabled={isForgotSubmitting}
-                      className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                      className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
                     >
                       {isForgotSubmitting ? (
                         <>
@@ -431,7 +431,7 @@ export function ModernLoginForm() {
                     initial={{ scale: 0.9 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1 }}
-                    className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                    className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4"
                   >
                     <CheckCircle2 className="w-8 h-8 text-white" />
                   </motion.div>

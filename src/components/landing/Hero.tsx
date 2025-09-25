@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 export function Hero() {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-white">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div 
@@ -44,7 +44,7 @@ export function Hero() {
           >
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-6 leading-tight">
               The Future of{' '}
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
+              <span className="text-blue-600">
                 Travel Booking
               </span>{' '}
               is Here
@@ -75,7 +75,7 @@ export function Hero() {
               <motion.button 
                 className={cn(
                   'btn btn-primary px-6 py-3 text-base font-semibold',
-                  'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700',
+                  'bg-blue-600 hover:bg-blue-700',
                   'shadow-lg hover:shadow-xl transform hover:-translate-y-1'
                 )}
                 whileHover={{ scale: 1.02, y: -1 }}

@@ -153,7 +153,7 @@ export function ModernRegisterForm() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-white py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -166,7 +166,7 @@ export function ModernRegisterForm() {
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.1 }}
-                  className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                  className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4"
                 >
                   <CheckCircle2 className="w-8 h-8 text-white" />
                 </motion.div>
@@ -194,7 +194,7 @@ export function ModernRegisterForm() {
 
                 <Button
                   onClick={() => router.push('/auth/login')}
-                  className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                  className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
                 >
                   Go to sign in
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -208,7 +208,7 @@ export function ModernRegisterForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-white py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full">
         {/* Header */}
         <motion.div
@@ -234,7 +234,7 @@ export function ModernRegisterForm() {
               <div key={step.id} className="flex items-center">
                 <div className={`flex items-center justify-center w-10 h-10 rounded-full text-sm font-medium transition-all duration-300 ${
                   currentStep >= step.id
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                    ? 'bg-blue-600 text-white shadow-lg'
                     : 'bg-gray-200 text-gray-600'
                 }`}>
                   {currentStep > step.id ? (
@@ -548,7 +548,7 @@ function BasicInfoStep({
 
             <Button
               type="submit"
-              className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
             >
               Continue
               <ArrowRight className="w-4 h-4 ml-2" />
@@ -621,7 +621,7 @@ function RoleSelectionStep({ onNext, onPrev, defaultValues }: {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start">
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center bg-gradient-to-r ${role.color} text-white mr-4`}>
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center bg-blue-600 text-white mr-4`}>
                         {role.icon}
                       </div>
                       <div>
@@ -665,7 +665,7 @@ function RoleSelectionStep({ onNext, onPrev, defaultValues }: {
               </Button>
               <Button
                 type="submit"
-                className="h-12 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                className="h-12 px-6 bg-blue-600 hover:bg-blue-700"
               >
                 Continue
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -822,7 +822,7 @@ function CompanyInfoStep({ onSubmit, onPrev, defaultValues, isSubmitting, error 
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="h-12 px-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                className="h-12 px-6 bg-green-600 hover:bg-green-700"
               >
                 {isSubmitting ? (
                   <>

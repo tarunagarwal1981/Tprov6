@@ -40,7 +40,6 @@ export function TopPackages({
       transition={{ duration: 0.3, delay }}
       className="backdrop-blur-xl rounded-2xl border border-white/20"
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
       }}
     >
@@ -70,13 +69,13 @@ export function TopPackages({
                 className="flex items-center justify-between p-4 backdrop-blur-sm bg-white/20 rounded-xl border border-white/30 hover:bg-white/30 transition-all duration-200 group"
               >
                 <div className="flex items-center space-x-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${
-                    pkg.color === 'blue' ? 'from-blue-500 to-blue-600' :
-                    pkg.color === 'green' ? 'from-green-500 to-green-600' :
-                    pkg.color === 'purple' ? 'from-purple-500 to-purple-600' :
-                    pkg.color === 'cyan' ? 'from-cyan-500 to-cyan-600' :
-                    pkg.color === 'orange' ? 'from-orange-500 to-orange-600' :
-                    'from-red-500 to-red-600'
+                  <div className={`w-12 h-12 rounded-xl ${
+                    pkg.color === 'blue' ? 'bg-blue-600' :
+                    pkg.color === 'green' ? 'bg-green-600' :
+                    pkg.color === 'purple' ? 'bg-purple-600' :
+                    pkg.color === 'cyan' ? 'bg-cyan-600' :
+                    pkg.color === 'orange' ? 'bg-orange-600' :
+                    'bg-red-600'
                   } flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>

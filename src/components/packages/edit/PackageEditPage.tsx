@@ -134,10 +134,10 @@ const Toast = ({ message, type, onClose }: ToastProps) => {
         'text-blue-800'
       }`}
       style={{
-        background: type === 'success' ? 'linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(34,197,94,0.05) 100%)' :
-                   type === 'error' ? 'linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(239,68,68,0.05) 100%)' :
-                   type === 'warning' ? 'linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(245,158,11,0.05) 100%)' :
-                   'linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0.05) 100%)',
+        background: type === 'success' ? 'rgba(34,197,94,0.1)' :
+                   type === 'error' ? 'rgba(239,68,68,0.1)' :
+                   type === 'warning' ? 'rgba(245,158,11,0.1)' :
+                   'rgba(59,130,246,0.1)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
       }}
     >
@@ -259,8 +259,8 @@ const ImageUpload = ({ onUpload, preview, label = "Upload Image" }: {
       }`}
       style={{
         background: dragOver 
-          ? 'linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0.05) 100%)'
-          : 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+          ? 'rgba(59,130,246,0.1)'
+          : 'rgba(255,255,255,0.05)',
         boxShadow: dragOver 
           ? '0 8px 32px rgba(59,130,246,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
           : '0 4px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.1)'
@@ -360,7 +360,7 @@ const ListManager = ({ items, onChange, placeholder }: {
         <button
           type="button"
           onClick={addItem}
-          className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 hover:scale-105 transition-all duration-200 backdrop-blur-sm"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl hover:scale-105 transition-all duration-200 backdrop-blur-sm"
           style={{
             boxShadow: '0 4px 16px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
           }}
@@ -374,7 +374,6 @@ const ListManager = ({ items, onChange, placeholder }: {
           {safeItems.map((item, index) => (
             <div key={index} className="flex items-center justify-between backdrop-blur-sm px-4 py-3 rounded-xl group border border-white/20"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
               boxShadow: '0 4px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.1)'
             }}>
               <span className="text-sm text-gray-700">{item}</span>
@@ -421,7 +420,6 @@ const PricingSection = ({ pricing, onChange }: {
       {safePricing.map((price, index) => (
         <div key={index} className="backdrop-blur-xl border border-white/20 rounded-2xl p-5 space-y-4"
         style={{
-          background: 'linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.05) 100%)',
           boxShadow: '0 8px 32px rgba(59,130,246,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
         }}>
           <div className="flex justify-between items-center">

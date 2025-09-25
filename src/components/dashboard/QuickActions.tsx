@@ -32,7 +32,6 @@ export function QuickActions({
       transition={{ duration: 0.3, delay }}
       className="backdrop-blur-xl rounded-2xl border border-white/20 p-6"
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
       }}
     >
@@ -54,7 +53,7 @@ export function QuickActions({
                 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`w-12 h-12 rounded-xl ${action.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <Icon className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">{action.title}</h3>

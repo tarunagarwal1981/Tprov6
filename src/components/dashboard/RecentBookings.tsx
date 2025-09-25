@@ -40,7 +40,6 @@ export function RecentBookings({
       transition={{ duration: 0.3, delay }}
       className="lg:col-span-2 backdrop-blur-xl rounded-2xl border border-white/20"
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
       }}
     >
@@ -69,9 +68,9 @@ export function RecentBookings({
             >
               <div className="flex items-center space-x-4">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-semibold text-sm ${
-                  booking.priority === 'high' ? 'bg-gradient-to-br from-red-500 to-red-600' :
-                  booking.priority === 'medium' ? 'bg-gradient-to-br from-yellow-500 to-yellow-600' :
-                  'bg-gradient-to-br from-gray-500 to-gray-600'
+                  booking.priority === 'high' ? 'bg-red-600' :
+                  booking.priority === 'medium' ? 'bg-yellow-600' :
+                  'bg-gray-600'
                 }`}>
                   {booking.avatar}
                 </div>

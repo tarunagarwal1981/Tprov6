@@ -130,13 +130,11 @@ const InfoCard = ({ title, children, icon: Icon, className = '' }: {
 }) => (
   <div className={cn("backdrop-blur-xl rounded-3xl border border-white/40 p-7", className)}
   style={{
-    background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.3) 100%)',
     boxShadow: '0 25px 50px rgba(0,0,0,0.15), 0 10px 20px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.9)'
   }}>
     <div className="flex items-center gap-4 mb-5">
       <div className="p-3 backdrop-blur-md rounded-2xl border border-white/50"
       style={{
-        background: 'linear-gradient(135deg, rgba(59,130,246,0.3) 0%, rgba(59,130,246,0.1) 100%)',
         boxShadow: '0 8px 25px rgba(59,130,246,0.2), inset 0 2px 4px rgba(255,255,255,0.6)'
       }}>
         <Icon className="w-5 h-5 text-blue-600" />
@@ -351,15 +349,7 @@ export default function ImprovedPackageViewPage() {
   const pricingSlabs = ensureArray(safeJsonParse(packageData.pricing_slabs, []));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-purple-100 relative overflow-hidden">
-      {/* Bright animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 -right-32 w-96 h-96 bg-gradient-to-br from-blue-400/40 to-purple-500/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-gradient-to-br from-indigo-500/30 to-pink-500/40 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-gradient-to-br from-emerald-400/25 to-cyan-500/25 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/4 left-1/3 w-72 h-72 bg-gradient-to-br from-yellow-300/20 to-orange-400/25 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '3s' }} />
-        <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-gradient-to-br from-violet-400/15 to-fuchsia-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
-      </div>
+    <div className="min-h-screen bg-white relative overflow-hidden">
 
       {/* Header */}
       <div className="backdrop-blur-xl bg-white/90 border-b border-white/40 relative z-10" style={{
@@ -372,7 +362,6 @@ export default function ImprovedPackageViewPage() {
                 onClick={handleBack}
                 className="flex items-center gap-2 px-4 py-2.5 text-gray-600 hover:text-gray-900 backdrop-blur-sm rounded-xl transition-all duration-200 border border-white/20"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)',
                   boxShadow: '0 4px 16px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
                 }}
               >
@@ -382,7 +371,6 @@ export default function ImprovedPackageViewPage() {
               <div className="flex items-center gap-3">
                 <div className="p-3 backdrop-blur-sm rounded-xl border border-white/20"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0.05) 100%)',
                   boxShadow: '0 4px 16px rgba(59,130,246,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
                 }}>
                   <PackageTypeIcon type={packageData.type} />
@@ -415,7 +403,7 @@ export default function ImprovedPackageViewPage() {
               </button>
               <button
                 onClick={handleEdit}
-                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 hover:scale-105 transition-all duration-200 backdrop-blur-sm"
+                className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl hover:scale-105 transition-all duration-200 backdrop-blur-sm"
                 style={{
                   boxShadow: '0 8px 32px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
                 }}
@@ -571,7 +559,6 @@ export default function ImprovedPackageViewPage() {
             {/* Quick Stats */}
             <div className="backdrop-blur-xl rounded-3xl border border-white/40 p-7"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.3) 100%)',
               boxShadow: '0 25px 50px rgba(0,0,0,0.15), 0 10px 20px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.9)'
             }}>
               <h3 className="font-semibold text-gray-900 mb-4">Package Overview</h3>
@@ -703,7 +690,6 @@ export default function ImprovedPackageViewPage() {
             {/* Package Metadata */}
             <div className="backdrop-blur-xl rounded-3xl border border-white/40 p-7"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.3) 100%)',
               boxShadow: '0 25px 50px rgba(0,0,0,0.15), 0 10px 20px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.9)'
             }}>
               <h3 className="font-semibold text-gray-900 mb-4">Package Info</h3>
@@ -732,7 +718,6 @@ export default function ImprovedPackageViewPage() {
             {/* Quick Actions */}
             <div className="backdrop-blur-xl rounded-3xl border border-white/40 p-7"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.3) 100%)',
               boxShadow: '0 25px 50px rgba(0,0,0,0.15), 0 10px 20px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.9)'
             }}>
               <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
@@ -741,7 +726,6 @@ export default function ImprovedPackageViewPage() {
                   onClick={handleEdit}
                   className="w-full flex items-center justify-start gap-3 px-4 py-3 text-left text-blue-700 rounded-xl hover:scale-105 transition-all duration-200 border border-white/20 backdrop-blur-sm"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0.05) 100%)',
                     boxShadow: '0 4px 16px rgba(59,130,246,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
                   }}
                 >
@@ -750,7 +734,6 @@ export default function ImprovedPackageViewPage() {
                 </button>
                 <button className="w-full flex items-center justify-start gap-3 px-4 py-3 text-left text-gray-700 rounded-xl hover:scale-105 transition-all duration-200 border border-white/20 backdrop-blur-sm"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)',
                   boxShadow: '0 4px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.2)'
                 }}>
                   <BarChart3 className="w-4 h-4" />
@@ -758,7 +741,6 @@ export default function ImprovedPackageViewPage() {
                 </button>
                 <button className="w-full flex items-center justify-start gap-3 px-4 py-3 text-left text-gray-700 rounded-xl hover:scale-105 transition-all duration-200 border border-white/20 backdrop-blur-sm"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)',
                   boxShadow: '0 4px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.2)'
                 }}>
                   <Trophy className="w-4 h-4" />
