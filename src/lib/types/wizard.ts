@@ -1,4 +1,4 @@
-import { Package, PackageType, PackageStatus, DifficultyLevel, PackageDuration, GroupSize, PackagePricing, ItineraryDay } from '@/lib/types';
+import { Package, PackageType, PackageStatus, DifficultyLevel, PackageDuration, GroupSize, PackagePricing, ItineraryDay, OperationalHours, EmergencyContact, AgeRestrictions, FAQ, PackageVariant } from '@/lib/types';
 
 // Additional interfaces for the expanded form data
 export interface GroupDiscount {
@@ -146,6 +146,21 @@ export interface PackageFormData {
   weatherDependency: string[];
   languageOptions: string[];
   dressCode: string[];
+  
+  // Activity-specific fields
+  activityCategory?: string;
+  availableDays?: string[];
+  operationalHours?: OperationalHours;
+  meetingPoint?: string;
+  emergencyContact?: EmergencyContact;
+  transferOptions?: string[];
+  maxCapacity?: number;
+  languagesSupported?: string[];
+  accessibilityInfo?: string[];
+  ageRestrictionsDetailed?: AgeRestrictions;
+  importantInfo?: string;
+  faq?: FAQ[];
+  variants?: PackageVariant[];
   
   // Legacy fields (keeping for compatibility)
   difficulty: DifficultyLevel;

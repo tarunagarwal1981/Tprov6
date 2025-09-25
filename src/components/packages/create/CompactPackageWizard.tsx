@@ -26,8 +26,14 @@ import {
   Bed,
   Check,
   AlertTriangle,
-  Info
+  Info,
+  Shield
 } from 'lucide-react';
+
+// Import the new activity form components
+import ActivityDetailsForm from '@/components/packages/forms/ActivityDetailsForm';
+import PackageVariantsForm from '@/components/packages/forms/PackageVariantsForm';
+import ActivityPoliciesForm from '@/components/packages/forms/ActivityPoliciesForm';
 
 // Toast notification system
 const ToastContext = createContext<{
@@ -161,6 +167,21 @@ interface PackageFormData {
   durationHours?: number;
   inclusions?: string[];
   exclusions?: string[];
+  
+  // Activity-specific fields
+  activityCategory?: string;
+  availableDays?: string[];
+  operationalHours?: any;
+  meetingPoint?: string;
+  emergencyContact?: any;
+  transferOptions?: string[];
+  maxCapacity?: number;
+  languagesSupported?: string[];
+  accessibilityInfo?: string[];
+  ageRestrictionsDetailed?: any;
+  importantInfo?: string;
+  faq?: any[];
+  variants?: any[];
   
   // Package specific
   banner?: File | string;
@@ -945,20 +966,34 @@ const TransferForm = ({ data, onChange }: FormProps) => {
 };
 
 const ActivityForm = ({ data, onChange }: FormProps) => {
+  const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'variants' | 'policies'>('basic');
+  
   const places = [
     { value: 'mumbai', label: 'Mumbai' },
     { value: 'delhi', label: 'Delhi' },
     { value: 'bangalore', label: 'Bangalore' },
     { value: 'goa', label: 'Goa' },
-    { value: 'kerala', label: 'Kerala' }
+    { value: 'kerala', label: 'Kerala' },
+    { value: 'abu_dhabi', label: 'Abu Dhabi' },
+    { value: 'dubai', label: 'Dubai' },
+    { value: 'singapore', label: 'Singapore' },
+    { value: 'bangkok', label: 'Bangkok' },
+    { value: 'tokyo', label: 'Tokyo' }
+  ];
+
+  const tabs = [
+    { id: 'basic', label: 'Basic Info', icon: FileText },
+    { id: 'details', label: 'Activity Details', icon: Star },
+    { id: 'variants', label: 'Package Variants', icon: Package },
+    { id: 'policies', label: 'Policies & FAQ', icon: Shield }
   ];
 
   return (
-    <div className="max-w-5xl mx-auto space-y-5">
+    <div className="max-w-6xl mx-auto space-y-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-5"
+        className="text-center mb-6"
       >
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50/50 backdrop-blur-sm rounded-xl mb-2 border border-emerald-200/30"
         style={{
@@ -967,115 +1002,246 @@ const ActivityForm = ({ data, onChange }: FormProps) => {
           <Star className="w-4 h-4 text-emerald-600" />
           <span className="text-emerald-600 font-medium text-sm">Activity Experience</span>
         </div>
-        <h2 className="text-xl font-bold text-gray-900 mb-1">Activity Details</h2>
-        <p className="text-gray-600 text-sm">Create your activity or experience offering</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Your Activity</h2>
+        <p className="text-gray-600">Build a comprehensive activity package with all the details customers need</p>
       </motion.div>
 
+      {/* Tab Navigation */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="backdrop-blur-xl rounded-2xl border border-white/20 p-5 space-y-5"
+        className="backdrop-blur-xl rounded-2xl border border-white/20 p-2"
         style={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
           boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
         }}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div className="space-y-3">
-            <FormField 
-              label="Activity Name" 
-              required
-              description="Give your activity a compelling name"
+        <div className="flex space-x-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 ${
+                activeTab === tab.id
+                  ? 'bg-white/20 text-emerald-600 font-medium shadow-lg'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/10'
+              }`}
             >
-              <Input
-                placeholder="e.g., Mumbai City Walking Tour"
-                value={data.name || ''}
-                onChange={(value) => onChange({ name: value })}
-              />
-            </FormField>
+              <tab.icon className="w-4 h-4" />
+              <span className="text-sm">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </motion.div>
 
-            <FormField 
-              label="Destination" 
-              required
-              description="Where does this activity take place?"
+      {/* Tab Content */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="backdrop-blur-xl rounded-2xl border border-white/20 p-8"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
+        }}
+      >
+        <AnimatePresence mode="wait">
+          {activeTab === 'basic' && (
+            <motion.div
+              key="basic"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
             >
-              <Select
-                value={data.place || ''}
-                onChange={(value) => onChange({ place: value })}
-                options={places}
-                placeholder="Select destination"
-              />
-            </FormField>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <FormField 
+                    label="Activity Name" 
+                    required
+                    description="Give your activity a compelling name"
+                  >
+                    <Input
+                      placeholder="e.g., The National Aquarium Experience"
+                      value={data.title || data.name || ''}
+                      onChange={(value) => onChange({ title: value, name: value })}
+                    />
+                  </FormField>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField label="Timing" required>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                  <Input
-                    placeholder="9:00 AM - 5:00 PM"
-                    value={data.timing || ''}
-                    onChange={(value) => onChange({ timing: value })}
-                    style={{ paddingLeft: '2.5rem' }}
-                  />
+                  <FormField 
+                    label="Destination" 
+                    required
+                    description="Where does this activity take place?"
+                  >
+                    <Select
+                      value={data.place || ''}
+                      onChange={(value) => onChange({ place: value })}
+                      options={places}
+                      placeholder="Select destination"
+                    />
+                  </FormField>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField label="Timing" required>
+                      <div className="relative">
+                        <Clock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                        <Input
+                          placeholder="9:00 AM - 5:00 PM"
+                          value={data.timing || ''}
+                          onChange={(value) => onChange({ timing: value })}
+                          style={{ paddingLeft: '2.5rem' }}
+                        />
+                      </div>
+                    </FormField>
+                    <FormField label="Duration (Hours)" required>
+                      <Input
+                        type="number"
+                        placeholder="8"
+                        value={data.durationHours?.toString() || ''}
+                        onChange={(value) => onChange({ durationHours: parseInt(value) || 0 })}
+                      />
+                    </FormField>
+                  </div>
                 </div>
-              </FormField>
-              <FormField label="Duration (Hours)" required>
-                <Input
-                  type="number"
-                  placeholder="8"
-                  value={data.durationHours?.toString() || ''}
-                  onChange={(value) => onChange({ durationHours: parseInt(value) || 0 })}
-                />
-              </FormField>
-            </div>
-          </div>
 
-          <div className="space-y-4">
-            <FormField 
-              label="Activity Description"
-              description="Describe what makes this experience special"
+                <div className="space-y-4">
+                  <FormField 
+                    label="Activity Description"
+                    description="Describe what makes this experience special"
+                  >
+                    <Textarea
+                      placeholder="Describe your activity, what guests will experience, highlights..."
+                      value={data.description || ''}
+                      onChange={(value) => onChange({ description: value })}
+                      rows={8}
+                    />
+                  </FormField>
+                </div>
+              </div>
+
+              {/* Pricing Section */}
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold mb-4">Pricing</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField label="Adult Price" required>
+                    <div className="relative">
+                      <span className="absolute left-3 top-3 text-gray-500">$</span>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        value={data.pricing?.[0]?.adultPrice?.toString() || ''}
+                        onChange={(value) => onChange({ 
+                          pricing: [{ 
+                            ...data.pricing?.[0], 
+                            adultPrice: parseFloat(value) || 0 
+                          }] 
+                        })}
+                        style={{ paddingLeft: '2rem' }}
+                      />
+                    </div>
+                  </FormField>
+                  <FormField label="Child Price">
+                    <div className="relative">
+                      <span className="absolute left-3 top-3 text-gray-500">$</span>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        value={data.pricing?.[0]?.childPrice?.toString() || ''}
+                        onChange={(value) => onChange({ 
+                          pricing: [{ 
+                            ...data.pricing?.[0], 
+                            childPrice: parseFloat(value) || 0 
+                          }] 
+                        })}
+                        style={{ paddingLeft: '2rem' }}
+                      />
+                    </div>
+                  </FormField>
+                  <FormField label="Infant Price">
+                    <div className="relative">
+                      <span className="absolute left-3 top-3 text-gray-500">$</span>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        value={data.pricing?.[0]?.infantPrice?.toString() || ''}
+                        onChange={(value) => onChange({ 
+                          pricing: [{ 
+                            ...data.pricing?.[0], 
+                            infantPrice: parseFloat(value) || 0 
+                          }] 
+                        })}
+                        style={{ paddingLeft: '2rem' }}
+                      />
+                    </div>
+                  </FormField>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'details' && (
+            <motion.div
+              key="details"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
             >
-              <Textarea
-                placeholder="Describe your activity, what guests will experience, highlights..."
-                value={data.description || ''}
-                onChange={(value) => onChange({ description: value })}
-                rows={6}
+              <ActivityDetailsForm
+                formData={{
+                  activityCategory: data.activityCategory,
+                  availableDays: data.availableDays,
+                  operationalHours: data.operationalHours,
+                  meetingPoint: data.meetingPoint,
+                  emergencyContact: data.emergencyContact,
+                  transferOptions: data.transferOptions,
+                  maxCapacity: data.maxCapacity,
+                  languagesSupported: data.languagesSupported
+                }}
+                onChange={(updates) => onChange(updates)}
+                errors={{}}
               />
-            </FormField>
+            </motion.div>
+          )}
 
-            <FormField label="Activity Image">
-              <ImageUpload
-                onUpload={(file) => onChange({ image: file })}
-                preview={data.image}
-                label="Upload Activity Image"
+          {activeTab === 'variants' && (
+            <motion.div
+              key="variants"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              <PackageVariantsForm
+                variants={data.variants || []}
+                onChange={(variants) => onChange({ variants })}
+                errors={{}}
               />
-            </FormField>
-          </div>
-        </div>
+            </motion.div>
+          )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <ListManager
-            items={data.inclusions || []}
-            onChange={(inclusions) => onChange({ inclusions })}
-            placeholder="Add what's included..."
-            title="Inclusions"
-          />
-
-          <ListManager
-            items={data.exclusions || []}
-            onChange={(exclusions) => onChange({ exclusions })}
-            placeholder="Add what's not included..."
-            title="Exclusions"
-          />
-        </div>
-
-        <div className="border-t border-gray-200 pt-8">
-          <PricingSection
-            pricing={data.pricing || [{ adultPrice: 0, childPrice: 0, validFrom: '', validTo: '' }]}
-            onChange={(pricing) => onChange({ pricing })}
-          />
-        </div>
+          {activeTab === 'policies' && (
+            <motion.div
+              key="policies"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              <ActivityPoliciesForm
+                formData={{
+                  importantInfo: data.importantInfo,
+                  faq: data.faq,
+                  ageRestrictionsDetailed: data.ageRestrictionsDetailed,
+                  accessibilityInfo: data.accessibilityInfo
+                }}
+                onChange={(updates) => onChange(updates)}
+                errors={{}}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );
