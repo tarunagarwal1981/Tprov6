@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Booking Platform - Debug Mode</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .debug-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        .status-good {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00ff00;
+        }
+        .status-bad {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff0000;
+        }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .nav-links a {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+        }
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Travel Booking Platform</h1>
+        <p style="text-align: center; font-size: 1.2rem;">Debug Mode - Testing Netlify Deployment</p>
+        
+        <div class="debug-section status-good">
+            <h3>✅ Deployment Status</h3>
+            <p>If you can see this page, basic HTML deployment is working!</p>
+            <p>This is a simple HTML file to test if Netlify can serve static files.</p>
+        </div>
+
+        <div class="debug-section">
+            <h3>🔍 Debug Information</h3>
+            <p><strong>Current URL:</strong> <span id="current-url"></span></p>
+            <p><strong>Timestamp:</strong> <span id="timestamp"></span></p>
+            <p><strong>User Agent:</strong> <span id="user-agent"></span></p>
+            <p><strong>Page Load Time:</strong> <span id="load-time"></span></p>
+        </div>
+
+        <div class="nav-links">
+            <a href="/test.html">Test Page</a>
+            <a href="/auth/login/">Auth Login</a>
+            <a href="/admin/dashboard/">Admin Dashboard</a>
+            <a href="/operator/dashboard/">Operator Dashboard</a>
+        </div>
+
+        <div class="debug-section">
+            <h3>🧪 Route Testing</h3>
+            <p>Click the navigation links above to test if routes are working.</p>
+            <p>Check the browser console (F12) for detailed debug information.</p>
+            <div id="route-test-results"></div>
+        </div>
+
+        <div class="debug-section">
+            <h3>📋 Next Steps</h3>
+            <p>1. ✅ Verify this page loads (you're here!)</p>
+            <p>2. 🔍 Check browser console for errors</p>
+            <p>3. 🧪 Test navigation to other routes</p>
+            <p>4. 📁 Verify static files are accessible</p>
+            <p>5. 🔄 Test if _redirects file is working</p>
+        </div>
+    </div>
+
+    <script>
+        // Debug information
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('timestamp').textContent = new Date().toISOString();
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+        document.getElementById('load-time').textContent = new Date().toLocaleString();
+
+        // Console logs for debugging
+        console.log('🚀 Travel Booking Platform - Debug Mode Loaded!');
+        console.log('📍 Current URL:', window.location.href);
+        console.log('🕒 Load Time:', new Date().toISOString());
+        console.log('🌐 User Agent:', navigator.userAgent);
+        
+        // Test route accessibility
+        const routes = ['/auth/login/', '/admin/dashboard/', '/operator/dashboard/', '/agent/dashboard/'];
+        const resultsDiv = document.getElementById('route-test-results');
+        
+        console.log('🔍 Testing route accessibility...');
+        
+        routes.forEach(route => {
+            fetch(route)
+                .then(response => {
+                    const status = response.status === 200 ? '✅' : '❌';
+                    console.log(`${status} ${route} - Status: ${response.status}`);
+                    
+                    const result = document.createElement('p');
+                    result.textContent = `${status} ${route} - Status: ${response.status}`;
+                    resultsDiv.appendChild(result);
+                })
+                .catch(error => {
+                    console.log(`❌ ${route} - Error:`, error);
+                    
+                    const result = document.createElement('p');
+                    result.textContent = `❌ ${route} - Error: ${error.message}`;
+                    resultsDiv.appendChild(result);
+                });
+        });
+
+        // Test if _redirects is working by checking if we get redirected
+        console.log('🔄 Testing redirects...');
+        
+        // Add click handlers to navigation links
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                console.log('🔗 Clicked:', e.target.href);
+            });
+        });
+
+        // Test static file access
+        console.log('📁 Testing static file access...');
+        fetch('/favicon.ico')
+            .then(response => {
+                console.log('✅ favicon.ico accessible:', response.status);
+            })
+            .catch(error => {
+                console.log('❌ favicon.ico error:', error);
+            });
+    </script>
+</body>
+</html>

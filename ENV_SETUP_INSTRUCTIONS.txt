@@ -1,0 +1,20 @@
+# Environment Variables Setup Instructions
+# 
+# To fix the "supabaseKey is required" error, you need to create a .env.local file
+# in your project root with the following content:
+
+NEXT_PUBLIC_SUPABASE_URL=https://pmadgbdfpbnhacqjxwct.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtYWRnYmRmcGJuaGFjcWp4d2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MTQ4NTksImV4cCI6MjA3MzM5MDg1OX0.Q2R5iftFJJIrNj8xBdL7r4IRW8GzghjsN1OMvb7mixE
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+SUPABASE_DB_PASSWORD=your_database_password_here
+
+# Instructions:
+# 1. Create a new file named ".env.local" in your project root
+# 2. Copy the content above into that file
+# 3. Replace "your_service_role_key_here" with your actual service role key from Supabase
+# 4. Replace "your_database_password_here" with your database password
+# 5. Restart your development server (npm run dev)
+
+# Note: The Supabase client has been updated to use fallback values, so the error should
+# be resolved even without the .env.local file, but it's recommended to set up the
+# environment variables properly for production use.
