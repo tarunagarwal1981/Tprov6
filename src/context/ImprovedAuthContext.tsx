@@ -128,6 +128,7 @@ export function ImprovedAuthProvider({ children }: AuthProviderProps) {
   const initializationRef = useRef<boolean>(false);
   const sessionRefreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const profileCacheRef = useRef<Map<string, User>>(new Map()); // Add profile caching
+  const lastProcessedEventRef = useRef<string>(''); // Track last processed event to prevent duplicates
 
   // ===== LOAD USER PROFILE WITH IMPROVED ERROR HANDLING =====
   const loadUserProfile = useCallback(async (supabaseUser: SupabaseUser): Promise<User | null> => {
@@ -347,6 +348,14 @@ export function ImprovedAuthProvider({ children }: AuthProviderProps) {
         // Prevent duplicate processing of the same session
         const currentSessionId = state.session?.user?.id;
         const newSessionId = session?.user?.id;
+        const currentEventKey = `${event}-${newSessionId}`;
+        
+        // Check if we've already processed this exact event
+        if (lastProcessedEventRef.current === currentEventKey) {
+          console.log('⏭️ Skipping duplicate event:', currentEventKey);
+          return;
+        }
+        lastProcessedEventRef.current = currentEventKey;
 
         // Handle different events
         switch (event) {

@@ -6,6 +6,24 @@ export enum UserRole {
   TRAVEL_AGENT = 'TRAVEL_AGENT',
 }
 
+// ===== TRANSFER SYSTEM ENUMS =====
+export enum VehicleType {
+  SEDAN = 'SEDAN',
+  SUV = 'SUV',
+  HATCHBACK = 'HATCHBACK',
+  LUXURY_SEDAN = 'LUXURY_SEDAN',
+  TEMPO_TRAVELLER = 'TEMPO_TRAVELLER',
+  BUS = 'BUS',
+  CUSTOM = 'CUSTOM'
+}
+
+export enum TransferServiceType {
+  POINT_TO_POINT = 'POINT_TO_POINT',
+  AIRPORT_TRANSFER = 'AIRPORT_TRANSFER',
+  CITY_TOUR = 'CITY_TOUR',
+  HOURLY_RENTAL = 'HOURLY_RENTAL'
+}
+
 // ===== USER INTERFACES =====
 export interface User {
   id: string;
@@ -180,6 +198,17 @@ export interface Package {
   importantInfo?: string;
   faq?: FAQ[];
   variants?: PackageVariant[];
+  
+  // Transfer-specific fields
+  transferServiceType?: TransferServiceType;
+  distanceKm?: number;
+  estimatedDuration?: string;
+  advanceBookingHours?: number;
+  cancellationPolicyText?: string;
+  vehicleConfigs?: VehicleConfig[];
+  pickupPoints?: PickupPoint[];
+  dropoffPoints?: PickupPoint[];
+  additionalServices?: AdditionalService[];
 }
 
 export interface PackagePricing {
@@ -660,6 +689,42 @@ export enum TransferOption {
   HOTEL_PICKUP = 'HOTEL_PICKUP',
   AIRPORT_PICKUP = 'AIRPORT_PICKUP',
   CUSTOM_LOCATION = 'CUSTOM_LOCATION'
+}
+
+// ===== TRANSFER SYSTEM INTERFACES =====
+export interface VehicleConfig {
+  id?: string;
+  vehicleType: VehicleType | string; // Allow custom types
+  name: string;
+  minPassengers: number;
+  maxPassengers: number;
+  basePrice: number;
+  perKmRate?: number;
+  perHourRate?: number;
+  features: string[];
+  description?: string;
+  images?: string[];
+  isActive: boolean;
+  orderIndex: number;
+  transferType?: 'ONEWAY' | 'TWOWAY';
+}
+
+export interface PickupPoint {
+  id?: string;
+  name: string;
+  address: string;
+  coordinates?: { lat: number; lng: number };
+  landmarkNotes?: string;
+  isActive: boolean;
+}
+
+export interface AdditionalService {
+  id?: string;
+  name: string;
+  price: number;
+  description?: string;
+  isOptional: boolean;
+  isActive: boolean;
 }
 
 // Days of Week

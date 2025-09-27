@@ -27,12 +27,21 @@ import {
   Check,
   AlertTriangle,
   Info,
-  Shield
+  Shield,
+  Users,
+  Settings,
+  Wifi,
+  Music,
+  Coffee,
+  Luggage
 } from 'lucide-react';
 
 // Import the new activity form components
 import ActivityDetailsForm from '@/components/packages/forms/ActivityDetailsForm';
 import PackageVariantsForm from '@/components/packages/forms/PackageVariantsForm';
+import { VehicleConfig, PickupPoint, AdditionalService, VehicleType, TransferServiceType } from '@/lib/types';
+import { packageService } from '@/lib/services/packageService';
+import CitySearchInput from './CitySearchInput';
 import ActivityPoliciesForm from '@/components/packages/forms/ActivityPoliciesForm';
 
 // Toast notification system
@@ -161,6 +170,15 @@ interface PackageFormData {
   // Transfer specific
   from?: string;
   to?: string;
+  transferServiceType?: string;
+  distanceKm?: number;
+  estimatedDuration?: string;
+  advanceBookingHours?: number;
+  cancellationPolicyText?: string;
+  vehicleConfigs?: VehicleConfig[];
+  pickupPoints?: PickupPoint[];
+  additionalServices?: AdditionalService[];
+  transferType?: 'ONEWAY' | 'TWOWAY';
   
   // Activity specific
   timing?: string;
@@ -847,9 +865,10 @@ const PricingSection = ({ pricing, onChange }: PricingSectionProps) => {
 interface FormProps {
   data: PackageFormData;
   onChange: (data: Partial<PackageFormData>) => void;
+  errors?: Record<string, string>;
 }
 
-const TransferForm = ({ data, onChange }: FormProps) => {
+const TransferForm = ({ data, onChange, errors }: FormProps) => {
   const places = [
     { value: 'mumbai', label: 'Mumbai' },
     { value: 'delhi', label: 'Delhi' },
@@ -900,35 +919,57 @@ const TransferForm = ({ data, onChange }: FormProps) => {
               />
             </FormField>
 
-            <FormField 
-              label="City/Place" 
+            <CitySearchInput
+              label="City/Place"
               required
-              description="Select the city where this transfer operates"
-            >
-              <Select
-                value={data.place || ''}
-                onChange={(value) => onChange({ place: value })}
-                options={places}
-                placeholder="Select city"
-              />
-            </FormField>
+              value={data.place || ''}
+              onChange={(value) => onChange({ place: value })}
+              placeholder="Search for a city..."
+            />
 
             <div className="grid grid-cols-2 gap-4">
               <FormField label="From" required>
                 <Input
-                  placeholder="Starting location"
+                  placeholder="Starting location (e.g., Airport, Hotel, Station)"
                   value={data.from || ''}
                   onChange={(value) => onChange({ from: value })}
                 />
               </FormField>
               <FormField label="To" required>
                 <Input
-                  placeholder="Destination"
+                  placeholder="Destination (e.g., Hotel, Airport, Station)"
                   value={data.to || ''}
                   onChange={(value) => onChange({ to: value })}
                 />
               </FormField>
             </div>
+
+            <FormField label="Transfer Type" required>
+              <div className="flex gap-4">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="transferType"
+                    value="ONEWAY"
+                    checked={data.transferType === 'ONEWAY'}
+                    onChange={(e) => onChange({ transferType: e.target.value as 'ONEWAY' | 'TWOWAY' })}
+                    className="text-blue-600"
+                  />
+                  <span className="text-sm font-medium text-gray-700">One Way</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="transferType"
+                    value="TWOWAY"
+                    checked={data.transferType === 'TWOWAY'}
+                    onChange={(e) => onChange({ transferType: e.target.value as 'ONEWAY' | 'TWOWAY' })}
+                    className="text-blue-600"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Two Way (Round Trip)</span>
+                </label>
+              </div>
+            </FormField>
           </div>
 
           <div className="space-y-4">
@@ -954,12 +995,18 @@ const TransferForm = ({ data, onChange }: FormProps) => {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-8">
-          <PricingSection
-            pricing={data.pricing || [{ adultPrice: 0, childPrice: 0, validFrom: '', validTo: '' }]}
-            onChange={(pricing) => onChange({ pricing })}
-          />
-        </div>
+        {/* Vehicle Configuration Section */}
+        <VehicleConfigurationSection
+          vehicleConfigs={data.vehicleConfigs || []}
+          onChange={(vehicleConfigs) => onChange({ vehicleConfigs })}
+        />
+        
+        {/* Show validation error for vehicle configs */}
+        {errors?.vehicleConfigs && (
+          <div className="text-red-600 text-sm mt-2 p-3 bg-red-50 rounded-lg border border-red-200">
+            {errors.vehicleConfigs}
+          </div>
+        )}
       </motion.div>
     </div>
   );
@@ -1133,8 +1180,10 @@ const ActivityForm = ({ data, onChange }: FormProps) => {
                         value={data.pricing?.[0]?.adultPrice?.toString() || ''}
                         onChange={(value) => onChange({ 
                           pricing: [{ 
-                            ...data.pricing?.[0], 
-                            adultPrice: parseFloat(value) || 0 
+                            adultPrice: parseFloat(value) || 0,
+                            childPrice: data.pricing?.[0]?.childPrice || 0,
+                            validFrom: data.pricing?.[0]?.validFrom || '',
+                            validTo: data.pricing?.[0]?.validTo || ''
                           }] 
                         })}
                         style={{ paddingLeft: '2rem' }}
@@ -1150,25 +1199,10 @@ const ActivityForm = ({ data, onChange }: FormProps) => {
                         value={data.pricing?.[0]?.childPrice?.toString() || ''}
                         onChange={(value) => onChange({ 
                           pricing: [{ 
-                            ...data.pricing?.[0], 
-                            childPrice: parseFloat(value) || 0 
-                          }] 
-                        })}
-                        style={{ paddingLeft: '2rem' }}
-                      />
-                    </div>
-                  </FormField>
-                  <FormField label="Infant Price">
-                    <div className="relative">
-                      <span className="absolute left-3 top-3 text-gray-500">$</span>
-                      <Input
-                        type="number"
-                        placeholder="0.00"
-                        value={data.pricing?.[0]?.infantPrice?.toString() || ''}
-                        onChange={(value) => onChange({ 
-                          pricing: [{ 
-                            ...data.pricing?.[0], 
-                            infantPrice: parseFloat(value) || 0 
+                            adultPrice: data.pricing?.[0]?.adultPrice || 0,
+                            childPrice: parseFloat(value) || 0,
+                            validFrom: data.pricing?.[0]?.validFrom || '',
+                            validTo: data.pricing?.[0]?.validTo || ''
                           }] 
                         })}
                         style={{ paddingLeft: '2rem' }}
@@ -2301,9 +2335,8 @@ function CompactPackageWizardContent() {
 
   const handleTypeSelect = (type: PackageType) => {
     setSelectedType(type);
-    setFormData({ 
+    const baseFormData = {
       type, 
-      pricing: [{ adultPrice: 0, childPrice: 0, validFrom: '', validTo: '' }],
       inclusions: [],
       exclusions: [],
       tourInclusions: [],
@@ -2311,7 +2344,31 @@ function CompactPackageWizardContent() {
       destinations: [],
       itinerary: [],
       hotels: []
-    });
+    };
+
+    // Add type-specific initial data
+    if (type === PackageType.TRANSFERS) {
+      setFormData({
+        ...baseFormData,
+        vehicleConfigs: [{
+          vehicleType: VehicleType.SEDAN,
+          name: '',
+          minPassengers: 1,
+          maxPassengers: 4,
+          basePrice: 0,
+          features: [],
+          isActive: true,
+          orderIndex: 0,
+          transferType: 'ONEWAY'
+        }]
+      });
+    } else {
+      setFormData({
+        ...baseFormData,
+        pricing: [{ adultPrice: 0, childPrice: 0, validFrom: '', validTo: '' }]
+      });
+    }
+    
     setStep('form');
     addToast('Package type selected! Let\'s create your offering.', 'success');
   };
@@ -2340,6 +2397,29 @@ function CompactPackageWizardContent() {
       if (!formData.place) newErrors.place = 'Place is required';
       if (!formData.from) newErrors.from = 'Starting location is required';
       if (!formData.to) newErrors.to = 'Destination is required';
+      if (!formData.transferType) newErrors.transferType = 'Transfer type is required';
+      if (!formData.vehicleConfigs || formData.vehicleConfigs.length === 0) {
+        newErrors.vehicleConfigs = 'At least one vehicle configuration is required';
+      } else {
+        // Validate each vehicle configuration
+        formData.vehicleConfigs.forEach((config, index) => {
+          if (!config.name) {
+            newErrors[`vehicleConfigs.${index}.name`] = 'Vehicle service name is required';
+          }
+          if (!config.basePrice || config.basePrice <= 0) {
+            newErrors[`vehicleConfigs.${index}.basePrice`] = 'Base price must be greater than 0';
+          }
+          if (config.minPassengers < 1) {
+            newErrors[`vehicleConfigs.${index}.minPassengers`] = 'Minimum passengers must be at least 1';
+          }
+          if (config.maxPassengers < config.minPassengers) {
+            newErrors[`vehicleConfigs.${index}.maxPassengers`] = 'Maximum passengers must be greater than or equal to minimum passengers';
+          }
+          if (!config.transferType) {
+            newErrors[`vehicleConfigs.${index}.transferType`] = 'Transfer type is required for this vehicle';
+          }
+        });
+      }
     }
 
     if (formData.type === PackageType.ACTIVITY) {
@@ -2412,43 +2492,67 @@ function CompactPackageWizardContent() {
         title: formData.title || formData.name || 'Untitled Package',
         description: formData.description || '',
         type: formData.type,
-        adult_price: formData.pricing?.[0]?.adultPrice ?? 0,
-        child_price: formData.pricing?.[0]?.childPrice ?? 0,
+        // For transfer packages, use vehicle config pricing; for others, use legacy pricing
+        adult_price: formData.type === 'TRANSFERS' 
+          ? (formData.vehicleConfigs?.[0]?.basePrice ?? 0)
+          : (formData.pricing?.[0]?.adultPrice ?? 0),
+        child_price: formData.type === 'TRANSFERS' 
+          ? 0 // Transfer packages don't have child pricing in legacy format
+          : (formData.pricing?.[0]?.childPrice ?? 0),
         duration_days: formData.days ?? 1,
         duration_hours: formData.durationHours ?? 0,
-        status: status
+        status: status,
+        // Transfer-specific fields
+        transfer_service_type: formData.transferServiceType,
+        distance_km: formData.distanceKm,
+        estimated_duration: formData.estimatedDuration,
+        advance_booking_hours: formData.advanceBookingHours,
+        cancellation_policy_text: formData.cancellationPolicyText
       } as const;
       console.log('📦 Main insert data:', mainInsert);
 
-      console.log('💾 Inserting main package...');
-      const { data: pkgInsert, error: pkgErr } = await supabase
-        .from('packages')
-        .insert(mainInsert)
-        .select('id')
-        .single();
-      console.log('💾 Package insert result:', { pkgInsert, error: pkgErr });
-      if (pkgErr) throw pkgErr;
-      const packageId = pkgInsert.id as string;
+      // Use enhanced service for transfer packages with vehicle configs
+      if (formData.type === 'TRANSFERS' && formData.vehicleConfigs && formData.vehicleConfigs.length > 0) {
+        console.log('🚗 Using enhanced transfer package creation with vehicle configs...');
+        const { data: pkgInsert, error: pkgErr } = await packageService.createTransferPackageWithVehicles(
+          mainInsert, 
+          formData.vehicleConfigs
+        );
+        
+        if (pkgErr) throw pkgErr;
+        console.log('✅ Transfer package with vehicles created successfully:', pkgInsert);
+      } else {
+        console.log('💾 Inserting main package...');
+        const { data: pkgInsert, error: pkgErr } = await supabase
+          .from('packages')
+          .insert(mainInsert)
+          .select('id')
+          .single();
+        
+        console.log('💾 Package insert result:', { pkgInsert, error: pkgErr });
+        if (pkgErr) throw pkgErr;
+        const packageId = pkgInsert.id as string;
 
-      if (!packageId) {
-        throw new Error('Package was not created. No ID returned from database.');
+        if (!packageId) {
+          throw new Error('Package was not created. No ID returned from database.');
+        }
+        console.log('✅ Package ID obtained:', packageId);
+
+        // Verify insert exists (defensive check vs RLS or triggers)
+        console.log('🔍 Verifying package exists...');
+        const { data: verifyPkg, error: verifyErr } = await supabase
+          .from('packages')
+          .select('id')
+          .eq('id', packageId)
+          .maybeSingle();
+        console.log('🔍 Verification result:', { verifyPkg, error: verifyErr });
+        if (verifyErr) throw verifyErr;
+        if (!verifyPkg?.id) {
+          throw new Error('Package creation verification failed. Check RLS permissions and schema.');
+        }
+
+        // Continue with the rest of your save logic...
       }
-      console.log('✅ Package ID obtained:', packageId);
-
-      // Verify insert exists (defensive check vs RLS or triggers)
-      console.log('🔍 Verifying package exists...');
-      const { data: verifyPkg, error: verifyErr } = await supabase
-        .from('packages')
-        .select('id')
-        .eq('id', packageId)
-        .maybeSingle();
-      console.log('🔍 Verification result:', { verifyPkg, error: verifyErr });
-      if (verifyErr) throw verifyErr;
-      if (!verifyPkg?.id) {
-        throw new Error('Package creation verification failed. Check RLS permissions and schema.');
-      }
-
-      // Continue with the rest of your save logic...
       
       const successMessage = status === 'ACTIVE' 
         ? 'Package created and published successfully!' 
@@ -2467,7 +2571,7 @@ function CompactPackageWizardContent() {
   const renderForm = () => {
     switch (selectedType) {
       case PackageType.TRANSFERS:
-        return <TransferForm data={formData} onChange={updateFormData} />;
+        return <TransferForm data={formData} onChange={updateFormData} errors={errors} />;
       case PackageType.ACTIVITY:
         return <ActivityForm data={formData} onChange={updateFormData} />;
       case PackageType.MULTI_CITY_PACKAGE:
@@ -2612,6 +2716,324 @@ function CompactPackageWizardContent() {
       </div>
   );
 }
+
+// Vehicle Configuration Section Component
+const VehicleConfigurationSection = ({ 
+  vehicleConfigs, 
+  onChange 
+}: { 
+  vehicleConfigs: VehicleConfig[]; 
+  onChange: (configs: VehicleConfig[]) => void; 
+}) => {
+  const [customVehicleTypes, setCustomVehicleTypes] = useState<Record<number, string>>({});
+  const [showCustomInputs, setShowCustomInputs] = useState<Record<number, boolean>>({});
+
+  const vehicleTypeOptions = [
+    { value: VehicleType.SEDAN, label: 'Sedan', icon: Car },
+    { value: VehicleType.SUV, label: 'SUV', icon: Car },
+    { value: VehicleType.LUXURY_SEDAN, label: 'Luxury Sedan', icon: Car },
+    { value: VehicleType.TEMPO_TRAVELLER, label: 'Tempo Traveller', icon: Car },
+    { value: VehicleType.BUS, label: 'Bus', icon: Car },
+    { value: VehicleType.CUSTOM, label: 'Custom Type', icon: Settings },
+  ];
+
+  const availableFeatures = [
+    { id: 'AC', label: 'Air Conditioning', icon: Settings },
+    { id: 'WIFI', label: 'WiFi', icon: Wifi },
+    { id: 'MUSIC', label: 'Music System', icon: Music },
+    { id: 'REFRESHMENTS', label: 'Refreshments', icon: Coffee },
+    { id: 'LUGGAGE', label: 'Luggage Assistance', icon: Luggage },
+    { id: 'CHILD_SEAT', label: 'Child Seat', icon: Users },
+  ];
+
+  const addVehicleConfig = () => {
+    const newConfig: VehicleConfig = {
+      vehicleType: VehicleType.SEDAN,
+      name: '',
+      minPassengers: 1,
+      maxPassengers: 4,
+      basePrice: 0,
+      features: [],
+      isActive: true,
+      orderIndex: vehicleConfigs.length,
+      transferType: 'ONEWAY',
+    };
+    onChange([...vehicleConfigs, newConfig]);
+    // Clear custom input state for new vehicle
+    setCustomVehicleTypes(prev => ({ ...prev, [vehicleConfigs.length]: '' }));
+    setShowCustomInputs(prev => ({ ...prev, [vehicleConfigs.length]: false }));
+  };
+
+  const updateVehicleConfig = (index: number, field: keyof VehicleConfig, value: any) => {
+    const updated = [...vehicleConfigs];
+    updated[index] = { ...updated[index], [field]: value };
+    onChange(updated);
+  };
+
+  const removeVehicleConfig = (index: number) => {
+    onChange(vehicleConfigs.filter((_, i) => i !== index));
+    // Clean up custom input state for removed vehicle
+    setCustomVehicleTypes(prev => {
+      const newState = { ...prev };
+      delete newState[index];
+      return newState;
+    });
+    setShowCustomInputs(prev => {
+      const newState = { ...prev };
+      delete newState[index];
+      return newState;
+    });
+  };
+
+  const toggleFeature = (configIndex: number, featureId: string) => {
+    const config = vehicleConfigs[configIndex];
+    const updatedFeatures = config.features.includes(featureId)
+      ? config.features.filter(f => f !== featureId)
+      : [...config.features, featureId];
+    updateVehicleConfig(configIndex, 'features', updatedFeatures);
+  };
+
+  const handleVehicleTypeChange = (configIndex: number, value: string) => {
+    if (value === VehicleType.CUSTOM) {
+      setShowCustomInputs(prev => ({ ...prev, [configIndex]: true }));
+    } else {
+      setShowCustomInputs(prev => ({ ...prev, [configIndex]: false }));
+      updateVehicleConfig(configIndex, 'vehicleType', value);
+    }
+  };
+
+  const handleCustomVehicleType = (configIndex: number) => {
+    const customType = customVehicleTypes[configIndex];
+    if (customType?.trim()) {
+      updateVehicleConfig(configIndex, 'vehicleType', customType.trim());
+      setCustomVehicleTypes(prev => ({ ...prev, [configIndex]: '' }));
+      setShowCustomInputs(prev => ({ ...prev, [configIndex]: false }));
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      className="backdrop-blur-xl rounded-2xl border border-white/20 p-5 space-y-5"
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">Vehicle Configurations</h3>
+          <p className="text-sm text-gray-600">Add different vehicle options for your transfer service</p>
+        </div>
+        <button
+          type="button"
+          onClick={addVehicleConfig}
+          className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Add Vehicle
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        {vehicleConfigs.map((config, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 space-y-4"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <h4 className="font-medium text-gray-900">Vehicle {index + 1}</h4>
+              {vehicleConfigs.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeVehicleConfig(index)}
+                  className="text-red-500 hover:text-red-700 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Main vehicle details in a clean grid layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Vehicle Type */}
+              <div>
+                <FormField label="Vehicle Type" required>
+                  <div className="space-y-2">
+                    <Select
+                      value={config.vehicleType}
+                      onChange={(value) => handleVehicleTypeChange(index, value)}
+                      options={vehicleTypeOptions}
+                      placeholder="Select type"
+                    />
+                    {showCustomInputs[index] && (
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Enter custom type"
+                          value={customVehicleTypes[index] || ''}
+                          onChange={(value) => setCustomVehicleTypes(prev => ({ ...prev, [index]: value }))}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleCustomVehicleType(index)}
+                          className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        >
+                          <Check className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </FormField>
+              </div>
+
+              {/* Service Name */}
+              <div>
+                <FormField label="Service Name" required>
+                  <Input
+                    placeholder="e.g., Economy Sedan Transfer"
+                    value={config.name}
+                    onChange={(value) => updateVehicleConfig(index, 'name', value)}
+                  />
+                </FormField>
+              </div>
+
+              {/* Passenger Capacity */}
+              <div>
+                <FormField label="Passenger Capacity" required>
+                  <div className="flex gap-2">
+                    <Input
+                      type="number"
+                      min="1"
+                      max="50"
+                      placeholder="Min"
+                      value={config.minPassengers.toString()}
+                      onChange={(value) => updateVehicleConfig(index, 'minPassengers', parseInt(value) || 1)}
+                      className="text-center"
+                    />
+                    <span className="flex items-center text-gray-500 font-medium">to</span>
+                    <Input
+                      type="number"
+                      min={config.minPassengers}
+                      max="50"
+                      placeholder="Max"
+                      value={config.maxPassengers.toString()}
+                      onChange={(value) => updateVehicleConfig(index, 'maxPassengers', parseInt(value) || config.minPassengers)}
+                      className="text-center"
+                    />
+                  </div>
+                </FormField>
+              </div>
+
+              {/* Base Price */}
+              <div>
+                <FormField label="Base Price (₹)" required>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={config.basePrice.toString()}
+                    onChange={(value) => updateVehicleConfig(index, 'basePrice', parseFloat(value) || 0)}
+                  />
+                </FormField>
+              </div>
+
+              {/* Per KM Rate */}
+              <div>
+                <FormField label="Per KM Rate (₹)" description="Optional">
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={config.perKmRate?.toString() || ''}
+                    onChange={(value) => updateVehicleConfig(index, 'perKmRate', value ? parseFloat(value) : undefined)}
+                  />
+                </FormField>
+              </div>
+
+              {/* Transfer Type for this vehicle */}
+              <div>
+                <FormField label="Transfer Type" required>
+                  <div className="flex gap-4">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`transferType-${index}`}
+                        value="ONEWAY"
+                        checked={config.transferType === 'ONEWAY'}
+                        onChange={(e) => updateVehicleConfig(index, 'transferType', e.target.value)}
+                        className="text-blue-600"
+                      />
+                      <span className="text-sm font-medium text-gray-700">One Way</span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`transferType-${index}`}
+                        value="TWOWAY"
+                        checked={config.transferType === 'TWOWAY'}
+                        onChange={(e) => updateVehicleConfig(index, 'transferType', e.target.value)}
+                        className="text-blue-600"
+                      />
+                      <span className="text-sm font-medium text-gray-700">Two Way</span>
+                    </label>
+                  </div>
+                </FormField>
+              </div>
+            </div>
+
+            {/* Features */}
+            <FormField label="Vehicle Features">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {availableFeatures.map((feature) => (
+                  <label
+                    key={feature.id}
+                    className="flex items-center gap-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={config.features.includes(feature.id)}
+                      onChange={() => toggleFeature(index, feature.id)}
+                      className="rounded border-gray-300"
+                    />
+                    <feature.icon className="w-4 h-4 text-gray-600" />
+                    <span className="text-sm text-gray-700">{feature.label}</span>
+                  </label>
+                ))}
+              </div>
+            </FormField>
+
+            {/* Description */}
+            <FormField label="Description">
+              <Textarea
+                placeholder="Describe this vehicle option..."
+                value={config.description || ''}
+                onChange={(value) => updateVehicleConfig(index, 'description', value)}
+                rows={2}
+              />
+            </FormField>
+          </motion.div>
+        ))}
+
+        {vehicleConfigs.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            <Car className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>No vehicle configurations added yet</p>
+            <p className="text-sm">Click "Add Vehicle" to get started</p>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
 
 // Main wizard component with ToastProvider wrapper
 export default function CompactPackageWizard() {

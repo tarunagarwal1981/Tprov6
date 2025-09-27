@@ -7,7 +7,7 @@ import {
   SupabaseResponse,
   SupabaseListResponse 
 } from '../supabase-types'
-import { Package, PackageStatus, PackageType } from '../types'
+import { Package, PackageStatus, PackageType, VehicleConfig, PickupPoint, AdditionalService } from '../types'
 
 // Service response interfaces to match existing code
 export interface ServiceResponse<T> {
@@ -580,6 +580,269 @@ export class PackageService {
       is_featured: appPackage.isFeatured || false,
       rating: appPackage.rating || 0,
       review_count: appPackage.reviewCount || 0
+    }
+  }
+
+  // Enhanced transfer package methods
+  async createTransferPackageWithVehicles(packageData: DbPackageInsert, vehicleConfigs: VehicleConfig[]): Promise<ServiceResponse<DbPackage>> {
+    try {
+      // Start a transaction
+      const { data: packageResult, error: packageError } = await supabase
+        .from('packages')
+        .insert(packageData)
+        .select()
+        .single();
+
+      if (packageError) {
+        return { 
+          data: null as any, 
+          success: false, 
+          error: packageError.message 
+        };
+      }
+
+      // Insert vehicle configurations
+      if (vehicleConfigs.length > 0) {
+        const vehicleConfigsData = vehicleConfigs.map((config, index) => ({
+          transfer_package_id: packageResult.id,
+          vehicle_type: config.vehicleType,
+          name: config.name,
+          min_passengers: config.minPassengers,
+          max_passengers: config.maxPassengers,
+          base_price: config.basePrice,
+          per_km_rate: config.perKmRate,
+          per_hour_rate: config.perHourRate,
+          features: config.features,
+          description: config.description,
+          images: config.images || [],
+          is_active: config.isActive,
+          order_index: index
+        }));
+
+        const { error: vehicleError } = await supabase
+          .from('transfer_vehicle_configs')
+          .insert(vehicleConfigsData);
+
+        if (vehicleError) {
+          // Rollback package creation
+          await supabase.from('packages').delete().eq('id', packageResult.id);
+          return { 
+            data: null as any, 
+            success: false, 
+            error: vehicleError.message 
+          };
+        }
+      }
+
+      return { 
+        data: packageResult, 
+        success: true, 
+        message: 'Transfer package created successfully' 
+      };
+    } catch (error) {
+      return { 
+        data: null as any, 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to create transfer package' 
+      };
+    }
+  }
+
+  async getTransferPackageWithVehicles(packageId: string): Promise<ServiceResponse<Package & { vehicleConfigs: VehicleConfig[] }>> {
+    try {
+      // Get package
+      const { data: packageData, error: packageError } = await supabase
+        .from('packages')
+        .select('*')
+        .eq('id', packageId)
+        .single();
+
+      if (packageError) {
+        return { 
+          data: null as any, 
+          success: false, 
+          error: packageError.message 
+        };
+      }
+
+      // Get vehicle configurations
+      const { data: vehicleConfigs, error: vehicleError } = await supabase
+        .from('transfer_vehicle_configs')
+        .select('*')
+        .eq('transfer_package_id', packageId)
+        .eq('is_active', true)
+        .order('order_index');
+
+      if (vehicleError) {
+        return { 
+          data: null as any, 
+          success: false, 
+          error: vehicleError.message 
+        };
+      }
+
+      // Convert to app format
+      const appPackage = PackageService.convertToAppPackage(packageData);
+      const appVehicleConfigs: VehicleConfig[] = vehicleConfigs.map(config => ({
+        id: config.id,
+        vehicleType: config.vehicle_type,
+        name: config.name,
+        minPassengers: config.min_passengers,
+        maxPassengers: config.max_passengers,
+        basePrice: config.base_price,
+        perKmRate: config.per_km_rate,
+        perHourRate: config.per_hour_rate,
+        features: config.features || [],
+        description: config.description,
+        images: config.images || [],
+        isActive: config.is_active,
+        orderIndex: config.order_index
+      }));
+
+      return { 
+        data: { ...appPackage, vehicleConfigs: appVehicleConfigs }, 
+        success: true 
+      };
+    } catch (error) {
+      return { 
+        data: null as any, 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to fetch transfer package' 
+      };
+    }
+  }
+
+  async updateTransferPackageVehicles(packageId: string, vehicleConfigs: VehicleConfig[]): Promise<ServiceResponse<boolean>> {
+    try {
+      // Delete existing vehicle configurations
+      const { error: deleteError } = await supabase
+        .from('transfer_vehicle_configs')
+        .delete()
+        .eq('transfer_package_id', packageId);
+
+      if (deleteError) {
+        return { 
+          data: false, 
+          success: false, 
+          error: deleteError.message 
+        };
+      }
+
+      // Insert new vehicle configurations
+      if (vehicleConfigs.length > 0) {
+        const vehicleConfigsData = vehicleConfigs.map((config, index) => ({
+          transfer_package_id: packageId,
+          vehicle_type: config.vehicleType,
+          name: config.name,
+          min_passengers: config.minPassengers,
+          max_passengers: config.maxPassengers,
+          base_price: config.basePrice,
+          per_km_rate: config.perKmRate,
+          per_hour_rate: config.perHourRate,
+          features: config.features,
+          description: config.description,
+          images: config.images || [],
+          is_active: config.isActive,
+          order_index: index
+        }));
+
+        const { error: insertError } = await supabase
+          .from('transfer_vehicle_configs')
+          .insert(vehicleConfigsData);
+
+        if (insertError) {
+          return { 
+            data: false, 
+            success: false, 
+            error: insertError.message 
+          };
+        }
+      }
+
+      return { 
+        data: true, 
+        success: true, 
+        message: 'Vehicle configurations updated successfully' 
+      };
+    } catch (error) {
+      return { 
+        data: false, 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to update vehicle configurations' 
+      };
+    }
+  }
+
+  async searchTransferPackages(params: {
+    from?: string;
+    to?: string;
+    passengers?: number;
+    date?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<ServiceResponse<Array<Package & { vehicleConfigs: VehicleConfig[] }>>> {
+    try {
+      let query = supabase
+        .from('packages')
+        .select(`
+          *,
+          transfer_vehicle_configs (*)
+        `)
+        .eq('type', 'TRANSFERS')
+        .eq('status', 'ACTIVE');
+
+      // Apply filters
+      if (params.from) {
+        query = query.ilike('title', `%${params.from}%`);
+      }
+      if (params.to) {
+        query = query.ilike('description', `%${params.to}%`);
+      }
+
+      const { data, error } = await query
+        .limit(params.limit || 20)
+        .offset(params.offset || 0);
+
+      if (error) {
+        return { 
+          data: [], 
+          success: false, 
+          error: error.message 
+        };
+      }
+
+      // Convert to app format
+      const packages = data?.map(pkg => {
+        const appPackage = PackageService.convertToAppPackage(pkg);
+        const vehicleConfigs: VehicleConfig[] = pkg.transfer_vehicle_configs?.map((config: any) => ({
+          id: config.id,
+          vehicleType: config.vehicle_type,
+          name: config.name,
+          minPassengers: config.min_passengers,
+          maxPassengers: config.max_passengers,
+          basePrice: config.base_price,
+          perKmRate: config.per_km_rate,
+          perHourRate: config.per_hour_rate,
+          features: config.features || [],
+          description: config.description,
+          images: config.images || [],
+          isActive: config.is_active,
+          orderIndex: config.order_index
+        })) || [];
+
+        return { ...appPackage, vehicleConfigs };
+      }) || [];
+
+      return { 
+        data: packages, 
+        success: true 
+      };
+    } catch (error) {
+      return { 
+        data: [], 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to search transfer packages' 
+      };
     }
   }
 }

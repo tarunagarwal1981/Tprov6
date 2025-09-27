@@ -59,7 +59,7 @@ export function ImprovedProtectedRoute({
     loadingTimeoutRef.current = setTimeout(() => {
       console.warn('🚨 ProtectedRoute: Loading timeout reached, forcing no loading state');
       setForceNoLoading(true);
-    }, 15000); // 15 second timeout
+    }, 10000); // 10 second timeout
     
     return () => {
       if (loadingTimeoutRef.current) {
