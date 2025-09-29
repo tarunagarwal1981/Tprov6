@@ -2521,21 +2521,21 @@ function CompactPackageWizardContent() {
       console.log('👤 Auth user ID:', authUserId);
       if (!authUserId) throw new Error('Not authenticated');
 
-      console.log('🏢 Looking up tour operator for user:', authUserId);
-      const { data: tourOperator, error: tourOpErr } = await supabase
-        .from('tour_operators')
-        .select('id')
-        .eq('user_id', authUserId)
-        .maybeSingle();
-      console.log('🏢 Tour operator lookup result:', { tourOperator, error: tourOpErr });
-      if (tourOpErr) {
-        console.error('❌ Tour operator lookup error:', tourOpErr);
-        throw tourOpErr;
+      console.log('🏢 Ensuring tour operator profile exists for user:', authUserId);
+      const { TourOperatorService } = await import('@/lib/services/tourOperatorService');
+      const tourOperatorResult = await TourOperatorService.ensureTourOperatorProfile(authUserId);
+      console.log('🏢 Tour operator ensure result:', tourOperatorResult);
+      
+      if (tourOperatorResult.error) {
+        console.error('❌ Tour operator profile creation/lookup error:', tourOperatorResult.error);
+        throw tourOperatorResult.error;
       }
-      if (!tourOperator?.id) {
-        console.error('❌ No tour operator profile found for user:', authUserId);
-        throw new Error('No tour operator profile found');
+      if (!tourOperatorResult.data?.id) {
+        console.error('❌ Failed to create or find tour operator profile for user:', authUserId);
+        throw new Error('Failed to create or find tour operator profile');
       }
+      
+      const tourOperator = tourOperatorResult.data;
 
       // 2) Insert main package
       console.log('📦 Preparing main package insert...');
@@ -2620,11 +2620,12 @@ function CompactPackageWizardContent() {
         console.log('✅ Package ID obtained:', packageId);
 
         // Upload and save image if provided
-        if (formData.image && formData.image instanceof File) {
+        const imageFile = formData.image || formData.banner;
+        if (imageFile && imageFile instanceof File) {
           console.log('📸 Uploading package image...');
           const { ImageService } = await import('@/lib/services/imageService');
           const imageResult = await ImageService.uploadAndSavePackageImage(
-            formData.image, 
+            imageFile, 
             packageId, 
             true, // isPrimary
             0 // order

@@ -1,3 +1,236 @@
+/* ===== CRITICAL macOS COLOR MATCHING FIX ===== */
+/* Add this to the TOP of your globals.css file, BEFORE all other styles */
+
+/* 1. DISABLE FONT SMOOTHING ON macOS - This is the main culprit */
+@media screen and (-webkit-min-device-pixel-ratio: 1) {
+  * {
+    -webkit-font-smoothing: auto !important;
+    -moz-osx-font-smoothing: auto !important;
+  }
+}
+
+/* 2. FORCE STRONGER FONT WEIGHTS EVERYWHERE ON macOS */
+body, 
+input, 
+textarea, 
+select, 
+button,
+label,
+p,
+span,
+div,
+h1, h2, h3, h4, h5, h6 {
+  -webkit-font-smoothing: auto !important;
+  -moz-osx-font-smoothing: auto !important;
+  font-weight: 400 !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+/* 3. REMOVE ALL BACKDROP FILTERS - They cause washed-out appearance on macOS */
+* {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 4. FORCE SOLID BACKGROUNDS EVERYWHERE */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select,
+.form-input,
+.modern-input,
+.input-compact,
+.form-field input {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* 5. FORCE EXPLICIT HEX COLORS - NO CSS VARIABLES OR RGBA ON FORMS */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  opacity: 1 !important;
+}
+
+/* 6. FIX PLACEHOLDER COLORS */
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280 !important;
+  -webkit-text-fill-color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+/* 7. FIX LABEL COLORS */
+label,
+.form-label,
+.field-label,
+.auth-label {
+  color: #000000 !important;
+  font-weight: 600 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+/* 8. FIX ALL TEXT ELEMENTS */
+p, span, div:not(.modern-welcome-title) {
+  color: #111827 !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+/* 9. FIX BUTTON TEXT */
+button {
+  font-weight: 600 !important;
+  -webkit-font-smoothing: auto !important;
+}
+
+.btn-primary {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+.btn-secondary {
+  color: #111827 !important;
+}
+
+/* 10. FIX GRAY TEXT CLASSES */
+.text-gray-400,
+.text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.text-gray-600 {
+  color: #475569 !important;
+}
+
+.text-gray-700,
+.text-gray-800,
+.text-gray-900 {
+  color: #0f172a !important;
+}
+
+/* 11. FIX TEXT MUTED/SECONDARY */
+.text-muted,
+.text-secondary,
+.auth-footer-text,
+.modern-welcome-subtitle {
+  color: #64748b !important;
+}
+
+.text-primary,
+.text-default,
+.text-strong {
+  color: #0f172a !important;
+}
+
+/* 12. FIX BORDER VISIBILITY */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select,
+.card,
+.modern-card {
+  border: 1px solid #d1d5db !important;
+  border-width: 1.5px !important;
+}
+
+/* 13. FIX AUTOFILL STYLING ON macOS */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #000000 !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  background-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* 14. FIX NAVIGATION TEXT */
+nav a,
+.sidebar-nav-item {
+  color: #334155 !important;
+}
+
+.sidebar-nav-item:hover {
+  color: #0f172a !important;
+}
+
+.sidebar-nav-item.active {
+  color: #1e40af !important;
+}
+
+/* 15. FIX SELECT DROPDOWN ARROW VISIBILITY */
+select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* 16. FIX ICONS */
+svg,
+.lucide,
+[class*="lucide"] {
+  color: #111827 !important;
+  stroke: currentColor !important;
+}
+
+/* 17. REMOVE TRANSPARENT TEXT ON GRADIENTS */
+.text-transparent,
+.bg-clip-text {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  background-image: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+}
+
+.modern-welcome-title {
+  color: #1e40af !important;
+  -webkit-text-fill-color: #1e40af !important;
+}
+
+/* 18. FIX CARD BACKGROUNDS */
+.card,
+.modern-card,
+.glass,
+.auth-card,
+.form-section {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* 19. FIX DATE/TIME INPUTS */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(0) !important;
+  opacity: 1 !important;
+}
+
+/* 20. FIX RGBA COLORS THAT APPEAR LIGHT */
+.bg-white\/80,
+.bg-white\/90,
+.bg-white\/95 {
+  background-color: #ffffff !important;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
