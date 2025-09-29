@@ -71,9 +71,9 @@ export function TransfersPackageForm({
   ];
 
   const renderBasicInfo = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
           <FormField 
             label="Transfer Name" 
             required
@@ -109,7 +109,7 @@ export function TransfersPackageForm({
             error={errors.place}
           />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField label="From Location" required error={errors.from}>
               <Input
                 placeholder="Starting location (e.g., Airport, Hotel, Station)"
@@ -127,8 +127,8 @@ export function TransfersPackageForm({
           </div>
 
           <FormField label="Transfer Type" required>
-            <div className="flex gap-4">
-              <label className="flex items-center space-x-2 cursor-pointer">
+            <div className="flex gap-6">
+              <label className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="radio"
                   name="transferType"
@@ -139,7 +139,7 @@ export function TransfersPackageForm({
                 />
                 <span className="text-sm font-medium text-gray-700">One Way</span>
               </label>
-              <label className="flex items-center space-x-2 cursor-pointer">
+              <label className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="radio"
                   name="transferType"
@@ -163,7 +163,7 @@ export function TransfersPackageForm({
           </FormField>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <FormField 
             label="Service Description"
             description="Describe what makes your transfer service special"
@@ -185,7 +185,7 @@ export function TransfersPackageForm({
             />
           </FormField>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField label="Distance (km)" error={errors.distanceKm}>
               <Input
                 type="number"
@@ -240,11 +240,7 @@ export function TransfersPackageForm({
       
       <div className="space-y-4">
         {(data.additionalServices || []).map((service, index) => (
-          <div key={index} className="backdrop-blur-xl rounded-xl border border-white/20 p-4"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.1)'
-          }}>
+          <div key={index} className="bg-gray-50 border border-gray-200 rounded-xl p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField label="Service Name">
                 <Input
@@ -303,19 +299,19 @@ export function TransfersPackageForm({
             const newServices = [...(data.additionalServices || []), { name: '', price: 0, description: '' }];
             onChange({ additionalServices: newServices });
           }}
-          className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors"
+          className="w-full p-6 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors hover:bg-blue-50"
         >
-          <Plus className="w-5 h-5 mx-auto mb-2" />
-          Add Additional Service
+          <Plus className="w-6 h-6 mx-auto mb-3" />
+          <span className="font-medium">Add Additional Service</span>
         </button>
       </div>
     </div>
   );
 
   const renderPolicies = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
           <FormField 
             label="Cancellation Policy"
             description="Describe your cancellation and refund policy"
@@ -370,14 +366,14 @@ export function TransfersPackageForm({
           </FormField>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <FormField 
             label="Inclusions"
             description="What's included in the transfer service"
           >
-            <div className="space-y-2">
+            <div className="space-y-3">
               {(data.inclusions || []).map((inclusion, index) => (
-                <div key={index} className="flex gap-2">
+                <div key={index} className="flex gap-3">
                   <Input
                     placeholder="Add inclusion..."
                     value={inclusion}
@@ -393,7 +389,7 @@ export function TransfersPackageForm({
                       const newInclusions = (data.inclusions || []).filter((_, i) => i !== index);
                       onChange({ inclusions: newInclusions });
                     }}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -416,9 +412,9 @@ export function TransfersPackageForm({
             label="Exclusions"
             description="What's not included in the transfer service"
           >
-            <div className="space-y-2">
+            <div className="space-y-3">
               {(data.exclusions || []).map((exclusion, index) => (
-                <div key={index} className="flex gap-2">
+                <div key={index} className="flex gap-3">
                   <Input
                     placeholder="Add exclusion..."
                     value={exclusion}
@@ -434,7 +430,7 @@ export function TransfersPackageForm({
                       const newExclusions = (data.exclusions || []).filter((_, i) => i !== index);
                       onChange({ exclusions: newExclusions });
                     }}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -458,18 +454,15 @@ export function TransfersPackageForm({
   );
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-6"
+        className="text-center mb-8"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50/50 backdrop-blur-sm rounded-xl mb-2 border border-blue-200/30"
-        style={{
-          boxShadow: '0 4px 16px rgba(59,130,246,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-        }}>
-          <Car className="w-4 h-4 text-blue-600" />
-          <span className="text-blue-600 font-medium text-sm">Transfer Service</span>
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-blue-50 rounded-xl mb-4 border border-blue-200">
+          <Car className="w-5 h-5 text-blue-600" />
+          <span className="text-blue-600 font-medium">Transfer Service</span>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           {mode === 'create' ? 'Create Your Transfer Service' : 'Edit Transfer Service'}
@@ -482,21 +475,17 @@ export function TransfersPackageForm({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="backdrop-blur-xl rounded-2xl border border-white/20 p-2"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-        }}
+        className="bg-white rounded-2xl border border-gray-200 p-2 shadow-lg"
       >
-        <div className="flex space-x-1">
+        <div className="flex space-x-2">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+              className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
                 activeTab === tab.id
-                  ? 'bg-white/20 text-blue-600 shadow-lg'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/10'
+                  ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -512,11 +501,7 @@ export function TransfersPackageForm({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="backdrop-blur-xl rounded-2xl border border-white/20 p-6"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-        }}
+        className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg"
       >
         {activeTab === 'basic' && renderBasicInfo()}
         {activeTab === 'vehicles' && renderVehicleOptions()}

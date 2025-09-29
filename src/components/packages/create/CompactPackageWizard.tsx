@@ -331,19 +331,19 @@ const PackageTypeSelector = ({ onSelect }: { onSelect: (type: PackageType) => vo
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-4">
-      {/* Compact Header */}
+    <div className="max-w-7xl mx-auto px-6 py-8">
+      {/* Improved Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-6"
+        className="text-center mb-12"
       >
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Create Package</h1>
-        <p className="text-gray-600 max-w-xl mx-auto text-sm">Select the package type that best fits your offering</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">Create New Package</h1>
+        <p className="text-gray-600 max-w-2xl mx-auto text-base">Choose the package type that best matches your travel offering</p>
       </motion.div>
       
-      {/* Compact Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Improved Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {packageTypes.map((pkg, index) => {
           const IconComponent = pkg.icon;
           const isSelected = selectedType === pkg.type;
@@ -355,76 +355,58 @@ const PackageTypeSelector = ({ onSelect }: { onSelect: (type: PackageType) => vo
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ 
-                y: -8, 
-                scale: 1.03,
-                rotateX: 5,
-                rotateY: 2,
-                transition: { duration: 0.3, ease: "easeOut" }
+                y: -4, 
+                scale: 1.02,
+                transition: { duration: 0.2, ease: "easeOut" }
               }}
               whileTap={{ scale: 0.98 }}
-              className={`group relative backdrop-blur-xl rounded-3xl border border-white/30 transition-all duration-300 cursor-pointer overflow-hidden ${
+              className={`group relative bg-white rounded-2xl border-2 transition-all duration-200 cursor-pointer overflow-hidden shadow-lg hover:shadow-xl ${
                 isSelected 
-                  ? getColorClasses(pkg.color, 'selected')
-                  : 'hover:border-white/50 hover:shadow-2xl'
+                  ? 'border-blue-500 ring-2 ring-blue-200'
+                  : 'border-gray-200 hover:border-gray-300'
               }`}
-              style={{
-                background: isSelected 
-                  ? `linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.2) 100%)`
-                  : `linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 100%)`,
-                boxShadow: isSelected 
-                  ? '0 25px 50px rgba(0,0,0,0.15), 0 10px 20px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.8)'
-                  : '0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.07), inset 0 1px 2px rgba(255,255,255,0.6)',
-                transformStyle: 'preserve-3d'
-              }}
               onClick={() => handleSelect(pkg.type)}
             >
-              <div className="p-5">
-                {/* Compact Icon and Title */}
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`inline-flex p-3 rounded-2xl transition-all duration-300 backdrop-blur-md ${
-                    isSelected ? getColorClasses(pkg.color, 'bg') : 'bg-white/50 group-hover:' + getColorClasses(pkg.color, 'bg')
-                  }`}
-                  style={{
-                    boxShadow: '0 8px 25px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,0.7)',
-                    transform: 'translateZ(10px)'
-                  }}>
-                    <IconComponent className={`w-4 h-4 transition-colors duration-300 ${
-                      isSelected ? getColorClasses(pkg.color, 'text') : 'text-gray-500 group-hover:' + getColorClasses(pkg.color, 'text')
+              <div className="p-6">
+                {/* Improved Icon and Title */}
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`inline-flex p-3 rounded-xl transition-all duration-200 ${
+                    isSelected ? getColorClasses(pkg.color, 'bg') : 'bg-gray-100 group-hover:' + getColorClasses(pkg.color, 'bg')
+                  }`}>
+                    <IconComponent className={`w-6 h-6 transition-colors duration-200 ${
+                      isSelected ? getColorClasses(pkg.color, 'text') : 'text-gray-600 group-hover:' + getColorClasses(pkg.color, 'text')
                     }`} />
                   </div>
-                  <h3 className="text-base font-semibold text-gray-900">{pkg.title}</h3>
-                  {isSelected && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className={`ml-auto p-1 rounded-full backdrop-blur-sm ${getColorClasses(pkg.color, 'bg')}`}
-                      style={{
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-                      }}
-                    >
-                      <Check className={`w-2.5 h-2.5 ${getColorClasses(pkg.color, 'text')}`} />
-                    </motion.div>
-                  )}
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{pkg.title}</h3>
+                    {isSelected && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="inline-flex items-center gap-1 text-sm text-blue-600 font-medium"
+                      >
+                        <Check className="w-4 h-4" />
+                        Selected
+                      </motion.div>
+                    )}
+                  </div>
                 </div>
                 
-                {/* Compact Description */}
-                <p className="text-xs text-gray-600 mb-3 leading-relaxed">{pkg.description}</p>
+                {/* Improved Description */}
+                <p className="text-sm text-gray-600 mb-4 leading-relaxed">{pkg.description}</p>
                 
-                {/* Compact Features */}
-                <div className="space-y-1.5">
+                {/* Improved Features */}
+                <div className="space-y-2">
                   {(pkg.features || []).map((feature, featureIndex) => (
-                    <motion.div 
+                    <div 
                       key={featureIndex} 
-                      className="flex items-center text-xs text-gray-500"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: (index * 0.1) + (featureIndex * 0.05) }}
+                      className="flex items-center text-sm text-gray-500"
                     >
-                      <div className={`w-1 h-1 rounded-full mr-2 transition-colors duration-300 ${
+                      <div className={`w-1.5 h-1.5 rounded-full mr-3 ${
                         isSelected ? getColorClasses(pkg.color, 'text').replace('text-', 'bg-') : 'bg-gray-300'
                       }`} />
                       {feature}
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -879,35 +861,28 @@ const TransferForm = ({ data, onChange, errors }: FormProps) => {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto space-y-4">
+    <div className="max-w-6xl mx-auto space-y-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-4"
+        className="text-center mb-8"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50/50 backdrop-blur-sm rounded-xl mb-2 border border-blue-200/30"
-        style={{
-          boxShadow: '0 4px 16px rgba(59,130,246,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-        }}>
-          <Car className="w-4 h-4 text-blue-600" />
-          <span className="text-blue-600 font-medium text-sm">Transfer Service</span>
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-blue-50 rounded-xl mb-4 border border-blue-200">
+          <Car className="w-5 h-5 text-blue-600" />
+          <span className="text-blue-600 font-medium">Transfer Service</span>
         </div>
-        <h2 className="text-xl font-bold text-gray-900 mb-1">Transfer Details</h2>
-        <p className="text-gray-600 text-sm">Create your transfer service offering</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Transfer Details</h2>
+        <p className="text-gray-600">Create your transfer service offering</p>
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="backdrop-blur-xl rounded-2xl border border-white/20 p-5 space-y-5"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-        }}
+        className="bg-white rounded-2xl border border-gray-200 p-8 space-y-8 shadow-lg"
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div className="space-y-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-6">
             <FormField 
               label="Transfer Name" 
               required
@@ -928,7 +903,7 @@ const TransferForm = ({ data, onChange, errors }: FormProps) => {
               placeholder="Search for a city..."
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField label="From" required>
                 <Input
                   placeholder="Starting location (e.g., Airport, Hotel, Station)"
@@ -946,8 +921,8 @@ const TransferForm = ({ data, onChange, errors }: FormProps) => {
             </div>
 
             <FormField label="Transfer Type" required>
-              <div className="flex gap-4">
-                <label className="flex items-center space-x-2 cursor-pointer">
+              <div className="flex gap-6">
+                <label className="flex items-center space-x-3 cursor-pointer">
                   <input
                     type="radio"
                     name="transferType"
@@ -958,7 +933,7 @@ const TransferForm = ({ data, onChange, errors }: FormProps) => {
                   />
                   <span className="text-sm font-medium text-gray-700">One Way</span>
                 </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
+                <label className="flex items-center space-x-3 cursor-pointer">
                   <input
                     type="radio"
                     name="transferType"
@@ -973,7 +948,7 @@ const TransferForm = ({ data, onChange, errors }: FormProps) => {
             </FormField>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             <FormField 
               label="Service Description"
               description="Describe what makes your transfer service special"
@@ -1037,18 +1012,15 @@ const ActivityForm = ({ data, onChange }: FormProps) => {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-6"
+        className="text-center mb-8"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50/50 backdrop-blur-sm rounded-xl mb-2 border border-emerald-200/30"
-        style={{
-          boxShadow: '0 4px 16px rgba(16,185,129,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-        }}>
-          <Star className="w-4 h-4 text-emerald-600" />
-          <span className="text-emerald-600 font-medium text-sm">Activity Experience</span>
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-emerald-50 rounded-xl mb-4 border border-emerald-200">
+          <Star className="w-5 h-5 text-emerald-600" />
+          <span className="text-emerald-600 font-medium">Activity Experience</span>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Your Activity</h2>
         <p className="text-gray-600">Build a comprehensive activity package with all the details customers need</p>
@@ -1059,21 +1031,17 @@ const ActivityForm = ({ data, onChange }: FormProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="backdrop-blur-xl rounded-2xl border border-white/20 p-2"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-        }}
+        className="bg-white rounded-2xl border border-gray-200 p-2 shadow-lg"
       >
-        <div className="flex space-x-1">
+        <div className="flex space-x-2">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 ${
+              className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl transition-all duration-200 ${
                 activeTab === tab.id
-                  ? 'bg-white/20 text-emerald-600 font-medium shadow-lg'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/10'
+                  ? 'bg-emerald-50 text-emerald-600 font-medium border border-emerald-200'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -1088,11 +1056,7 @@ const ActivityForm = ({ data, onChange }: FormProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="backdrop-blur-xl rounded-2xl border border-white/20 p-8"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-        }}
+        className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg"
       >
         <AnimatePresence mode="wait">
           {activeTab === 'basic' && (
@@ -1101,10 +1065,10 @@ const ActivityForm = ({ data, onChange }: FormProps) => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
+              className="space-y-8"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="space-y-6">
                   <FormField 
                     label="Activity Name" 
                     required
@@ -1130,7 +1094,7 @@ const ActivityForm = ({ data, onChange }: FormProps) => {
                     />
                   </FormField>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField label="Timing" required>
                       <div className="relative">
                         <Clock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -1153,7 +1117,7 @@ const ActivityForm = ({ data, onChange }: FormProps) => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <FormField 
                     label="Activity Description"
                     description="Describe what makes this experience special"
@@ -1169,9 +1133,9 @@ const ActivityForm = ({ data, onChange }: FormProps) => {
               </div>
 
               {/* Pricing Section */}
-              <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold mb-4">Pricing</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="border-t border-gray-200 pt-8">
+                <h3 className="text-lg font-semibold mb-6">Pricing</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <FormField label="Adult Price" required>
                     <div className="relative">
                       <span className="absolute left-3 top-3 text-gray-500">$</span>
@@ -1316,21 +1280,21 @@ const MultiCityPackageForm = ({ data, onChange }: FormProps) => {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-8"
       >
-        <div className="inline-flex items-center gap-3 px-6 py-3 bg-purple-50 rounded-full mb-4">
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-purple-50 rounded-xl mb-4 border border-purple-200">
           <Package className="w-5 h-5 text-purple-600" />
           <span className="text-purple-600 font-medium">Multi City Package</span>
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Multi City Package</h2>
-        <p className="text-gray-600 text-lg">Create your comprehensive tour package</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Multi City Package</h2>
+        <p className="text-gray-600">Create your comprehensive tour package</p>
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200 overflow-hidden"
+        className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden"
       >
-        <div className="border-b border-gray-200 bg-gray-50/50">
+        <div className="border-b border-gray-200 bg-gray-50">
           <nav className="flex overflow-x-auto">
             {tabs.map((tab) => {
               const IconComponent = tab.icon;
@@ -1339,10 +1303,10 @@ const MultiCityPackageForm = ({ data, onChange }: FormProps) => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-3 px-6 py-4 border-b-3 font-semibold text-sm transition-all duration-300 whitespace-nowrap ${
+                  className={`flex items-center gap-3 px-6 py-4 border-b-2 font-semibold text-sm transition-all duration-200 whitespace-nowrap ${
                     isActive
-                      ? 'border-blue-500 text-blue-600 bg-blue-50/50'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                      ? 'border-purple-500 text-purple-600 bg-purple-50'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                   }`}
                 >
                   <IconComponent className="w-4 h-4" />
@@ -1628,21 +1592,21 @@ const MultiCityPackageWithHotelForm = ({ data, onChange }: FormProps) => {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-8"
       >
-        <div className="inline-flex items-center gap-3 px-6 py-3 bg-orange-50 rounded-full mb-4">
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-orange-50 rounded-xl mb-4 border border-orange-200">
           <Building className="w-5 h-5 text-orange-600" />
           <span className="text-orange-600 font-medium">Complete Package</span>
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Multi City Package + Hotels</h2>
-        <p className="text-gray-600 text-lg">Create your complete package with accommodation</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Multi City Package + Hotels</h2>
+        <p className="text-gray-600">Create your complete package with accommodation</p>
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200 overflow-hidden"
+        className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden"
       >
-        <div className="border-b border-gray-200 bg-gray-50/50">
+        <div className="border-b border-gray-200 bg-gray-50">
           <nav className="flex overflow-x-auto">
             {tabs.map((tab) => {
               const IconComponent = tab.icon;
@@ -1651,10 +1615,10 @@ const MultiCityPackageWithHotelForm = ({ data, onChange }: FormProps) => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-3 px-6 py-4 border-b-3 font-semibold text-sm transition-all duration-300 whitespace-nowrap ${
+                  className={`flex items-center gap-3 px-6 py-4 border-b-2 font-semibold text-sm transition-all duration-200 whitespace-nowrap ${
                     isActive
-                      ? 'border-orange-500 text-orange-600 bg-orange-50/50'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                      ? 'border-orange-500 text-orange-600 bg-orange-50'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                   }`}
                 >
                   <IconComponent className="w-4 h-4" />
@@ -2003,18 +1967,18 @@ const FixedDepartureForm = ({ data, onChange }: FormProps) => {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-8"
       >
-        <div className="inline-flex items-center gap-3 px-6 py-3 bg-red-50 rounded-full mb-4">
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-red-50 rounded-xl mb-4 border border-red-200">
           <Plane className="w-5 h-5 text-red-600" />
           <span className="text-red-600 font-medium">Fixed Departure</span>
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Fixed Departure Package</h2>
-        <p className="text-gray-600 text-lg">Create your pre-scheduled group tour with fixed dates</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Fixed Departure Package</h2>
+        <p className="text-gray-600">Create your pre-scheduled group tour with fixed dates</p>
       </motion.div>
 
       {/* Progress Steps */}
@@ -2055,7 +2019,7 @@ const FixedDepartureForm = ({ data, onChange }: FormProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200 p-8"
+        className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg"
       >
         <AnimatePresence mode="wait">
           {activeStep === 0 && (
@@ -2750,14 +2714,12 @@ function CompactPackageWizardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-purple-100 relative overflow-hidden">
-      {/* Bright animated background elements */}
+    <div className="min-h-screen bg-gray-50 relative">
+      {/* Subtle background pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 -right-32 w-96 h-96 bg-gradient-to-br from-blue-400/40 to-purple-500/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-gradient-to-br from-indigo-500/30 to-pink-500/40 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-br from-emerald-400/25 to-cyan-500/25 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-20 left-1/4 w-64 h-64 bg-gradient-to-br from-yellow-300/20 to-orange-400/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '3s' }} />
-        <div className="absolute bottom-20 right-1/4 w-72 h-72 bg-gradient-to-br from-green-400/20 to-teal-500/25 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-50/30 to-purple-50/20" />
+        <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-blue-100/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-purple-100/20 rounded-full blur-3xl" />
       </div>
         <AnimatePresence mode="wait">
           {step === 'type' && (
@@ -2767,7 +2729,7 @@ function CompactPackageWizardContent() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="py-4 relative z-10"
+              className="py-8 relative z-10"
             >
               <PackageTypeSelector onSelect={handleTypeSelect} />
             </motion.div>
@@ -2780,25 +2742,21 @@ function CompactPackageWizardContent() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="py-4 relative z-10"
+              className="py-8 relative z-10"
             >
-              <div className="max-w-6xl mx-auto px-4 relative z-10">
-                {/* Compact Header */}
+              <div className="max-w-7xl mx-auto px-6 relative z-10">
+                {/* Improved Header */}
                 <motion.div 
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center justify-between mb-4"
+                  className="flex items-center justify-between mb-8"
                 >
                   <button
                     onClick={() => {
                       setStep('type');
                       addToast('Returning to package selection', 'info');
                     }}
-                    className="group flex items-center gap-2 px-4 py-2 text-gray-600 backdrop-blur-xl rounded-xl hover:text-gray-900 transition-all duration-200 border border-white/20"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)',
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-                    }}
+                    className="group flex items-center gap-2 px-4 py-2 text-gray-600 bg-white rounded-lg hover:text-gray-900 transition-all duration-200 border border-gray-200 shadow-sm hover:shadow-md"
                   >
                     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform duration-200" />
                     <span className="font-medium text-sm">Back</span>
@@ -2832,20 +2790,17 @@ function CompactPackageWizardContent() {
                           handleSave('DRAFT');
                         }}
                         disabled={isSaving}
-                        className="relative flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm"
-                        style={{
-                          boxShadow: '0 6px 24px rgba(75,85,99,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
-                        }}
+                        className="relative flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
                       >
                         {isSaving ? (
                           <>
-                            <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            <span className="font-medium text-sm">Saving...</span>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span className="font-medium">Saving...</span>
                           </>
                         ) : (
                           <>
-                            <Save className="w-3.5 h-3.5" />
-                            <span className="font-medium text-sm">Save Draft</span>
+                            <Save className="w-4 h-4" />
+                            <span className="font-medium">Save Draft</span>
                           </>
                         )}
                       </button>
@@ -2862,22 +2817,17 @@ function CompactPackageWizardContent() {
                           handleSave('ACTIVE');
                         }}
                         disabled={isSaving}
-                        className="relative flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm"
-                        style={{
-                          boxShadow: '0 6px 24px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
-                        }}
-                        onMouseDown={() => console.log('🖱️ SUBMIT BUTTON MOUSE DOWN')}
-                        onMouseUp={() => console.log('🖱️ SUBMIT BUTTON MOUSE UP')}
+                        className="relative flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
                       >
                         {isSaving ? (
                           <>
-                            <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            <span className="font-medium text-sm">Publishing...</span>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span className="font-medium">Publishing...</span>
                           </>
                         ) : (
                           <>
-                            <CheckCircle className="w-3.5 h-3.5" />
-                            <span className="font-medium text-sm">Submit & Publish</span>
+                            <CheckCircle className="w-4 h-4" />
+                            <span className="font-medium">Submit & Publish</span>
                           </>
                         )}
                       </button>
@@ -2993,11 +2943,7 @@ const VehicleConfigurationSection = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="backdrop-blur-xl rounded-2xl border border-white/20 p-5 space-y-5"
-      style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-      }}
+      className="bg-white rounded-2xl border border-gray-200 p-6 space-y-6 shadow-lg"
     >
       <div className="flex items-center justify-between">
         <div>
@@ -3007,7 +2953,7 @@ const VehicleConfigurationSection = ({
         <button
           type="button"
           onClick={addVehicleConfig}
-          className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
         >
           <Plus className="w-4 h-4" />
           Add Vehicle
@@ -3020,10 +2966,7 @@ const VehicleConfigurationSection = ({
             key={index}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 space-y-4"
-            style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-            }}
+            className="bg-gray-50 border border-gray-200 rounded-xl p-6 space-y-6"
           >
             <div className="flex items-center justify-between">
               <h4 className="font-medium text-gray-900">Vehicle {index + 1}</h4>
@@ -3039,7 +2982,7 @@ const VehicleConfigurationSection = ({
             </div>
 
             {/* Main vehicle details in a clean grid layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Vehicle Type */}
               <div>
                 <FormField label="Vehicle Type" required>
@@ -3169,11 +3112,11 @@ const VehicleConfigurationSection = ({
 
             {/* Features */}
             <FormField label="Vehicle Features">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {availableFeatures.map((feature) => (
                   <label
                     key={feature.id}
-                    className="flex items-center gap-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer"
+                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
                   >
                     <input
                       type="checkbox"
