@@ -127,9 +127,9 @@ export function ActivityPackageForm({
   ];
 
   const renderBasicInfo = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
           <FormField 
             label="Activity Name" 
             required
@@ -174,7 +174,7 @@ export function ActivityPackageForm({
             />
           </FormField>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField label="Duration (hours)" required error={errors.durationHours}>
               <Input
                 type="number"
@@ -194,7 +194,7 @@ export function ActivityPackageForm({
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <FormField 
             label="Activity Description"
             description="Describe what makes your activity special"
@@ -221,9 +221,9 @@ export function ActivityPackageForm({
   );
 
   const renderActivityDetails = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
           <FormField label="Timing" required>
             <Input
               placeholder="e.g., Morning 6:00 AM - 10:00 AM"
@@ -241,9 +241,9 @@ export function ActivityPackageForm({
           </FormField>
 
           <FormField label="Available Days">
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-3">
               {daysOfWeek.map((day) => (
-                <label key={day.value} className="flex items-center space-x-2">
+                <label key={day.value} className="flex items-center space-x-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={data.availableDays?.includes(day.value) || false}
@@ -255,7 +255,7 @@ export function ActivityPackageForm({
                         onChange({ availableDays: currentDays.filter(d => d !== day.value) });
                       }
                     }}
-                    className="text-blue-600"
+                    className="text-green-600"
                   />
                   <span className="text-sm text-gray-700">{day.label}</span>
                 </label>
@@ -264,9 +264,9 @@ export function ActivityPackageForm({
           </FormField>
 
           <FormField label="Languages Supported">
-            <div className="space-y-2 max-h-32 overflow-y-auto">
+            <div className="grid grid-cols-2 gap-3 max-h-40 overflow-y-auto">
               {languages.map((lang) => (
-                <label key={lang.value} className="flex items-center space-x-2">
+                <label key={lang.value} className="flex items-center space-x-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={data.languagesSupported?.includes(lang.value) || false}
@@ -278,7 +278,7 @@ export function ActivityPackageForm({
                         onChange({ languagesSupported: currentLangs.filter(l => l !== lang.value) });
                       }
                     }}
-                    className="text-blue-600"
+                    className="text-green-600"
                   />
                   <span className="text-sm text-gray-700">{lang.label}</span>
                 </label>
@@ -287,9 +287,9 @@ export function ActivityPackageForm({
           </FormField>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <FormField label="Operational Hours">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 type="time"
                 placeholder="Start time"
@@ -352,8 +352,8 @@ export function ActivityPackageForm({
           </FormField>
 
           <FormField label="Age Restrictions">
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   type="number"
                   placeholder="Min age"
@@ -377,7 +377,7 @@ export function ActivityPackageForm({
                   })}
                 />
               </div>
-              <label className="flex items-center space-x-2">
+              <label className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={data.ageRestrictionsDetailed?.adultSupervision || false}
@@ -387,7 +387,7 @@ export function ActivityPackageForm({
                       adultSupervision: e.target.checked 
                     } 
                   })}
-                  className="text-blue-600"
+                  className="text-green-600"
                 />
                 <span className="text-sm text-gray-700">Adult supervision required</span>
               </label>
@@ -416,12 +416,8 @@ export function ActivityPackageForm({
       
       <div className="space-y-4">
         {(data.variants || []).map((variant, index) => (
-          <div key={index} className="backdrop-blur-xl rounded-xl border border-white/20 p-4"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.1)'
-          }}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div key={index} className="bg-gray-50 border border-gray-200 rounded-xl p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField label="Variant Name">
                 <Input
                   placeholder="e.g., Standard Package"
@@ -446,7 +442,7 @@ export function ActivityPackageForm({
               </FormField>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
               <FormField label="Adult Price">
                 <Input
                   type="number"
@@ -497,8 +493,8 @@ export function ActivityPackageForm({
               </FormField>
             </div>
             
-            <div className="flex items-center justify-between mt-4">
-              <label className="flex items-center space-x-2">
+            <div className="flex items-center justify-between mt-6">
+              <label className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={variant.isActive || false}
@@ -507,7 +503,7 @@ export function ActivityPackageForm({
                     newVariants[index] = { ...variant, isActive: e.target.checked };
                     onChange({ variants: newVariants });
                   }}
-                  className="text-blue-600"
+                  className="text-green-600"
                 />
                 <span className="text-sm text-gray-700">Active</span>
               </label>
@@ -517,7 +513,7 @@ export function ActivityPackageForm({
                   const newVariants = (data.variants || []).filter((_, i) => i !== index);
                   onChange({ variants: newVariants });
                 }}
-                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -542,19 +538,19 @@ export function ActivityPackageForm({
             }];
             onChange({ variants: newVariants });
           }}
-          className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors"
+          className="w-full p-6 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-green-500 hover:text-green-600 transition-colors hover:bg-green-50"
         >
-          <Plus className="w-5 h-5 mx-auto mb-2" />
-          Add Package Variant
+          <Plus className="w-6 h-6 mx-auto mb-3" />
+          <span className="font-medium">Add Package Variant</span>
         </button>
       </div>
     </div>
   );
 
   const renderPolicies = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
           <FormField 
             label="Cancellation Policy"
             description="Describe your cancellation and refund policy"
@@ -609,14 +605,14 @@ export function ActivityPackageForm({
           </FormField>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <FormField 
             label="Inclusions"
             description="What's included in the activity"
           >
-            <div className="space-y-2">
+            <div className="space-y-3">
               {(data.inclusions || []).map((inclusion, index) => (
-                <div key={index} className="flex gap-2">
+                <div key={index} className="flex gap-3">
                   <Input
                     placeholder="Add inclusion..."
                     value={inclusion}
@@ -632,7 +628,7 @@ export function ActivityPackageForm({
                       const newInclusions = (data.inclusions || []).filter((_, i) => i !== index);
                       onChange({ inclusions: newInclusions });
                     }}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -644,7 +640,7 @@ export function ActivityPackageForm({
                   const newInclusions = [...(data.inclusions || []), ''];
                   onChange({ inclusions: newInclusions });
                 }}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-green-600 hover:text-green-700 text-sm font-medium"
               >
                 + Add Inclusion
               </button>
@@ -655,9 +651,9 @@ export function ActivityPackageForm({
             label="Exclusions"
             description="What's not included in the activity"
           >
-            <div className="space-y-2">
+            <div className="space-y-3">
               {(data.exclusions || []).map((exclusion, index) => (
-                <div key={index} className="flex gap-2">
+                <div key={index} className="flex gap-3">
                   <Input
                     placeholder="Add exclusion..."
                     value={exclusion}
@@ -673,7 +669,7 @@ export function ActivityPackageForm({
                       const newExclusions = (data.exclusions || []).filter((_, i) => i !== index);
                       onChange({ exclusions: newExclusions });
                     }}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -685,7 +681,7 @@ export function ActivityPackageForm({
                   const newExclusions = [...(data.exclusions || []), ''];
                   onChange({ exclusions: newExclusions });
                 }}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-green-600 hover:text-green-700 text-sm font-medium"
               >
                 + Add Exclusion
               </button>
@@ -697,18 +693,15 @@ export function ActivityPackageForm({
   );
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-6"
+        className="text-center mb-8"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50/50 backdrop-blur-sm rounded-xl mb-2 border border-green-200/30"
-        style={{
-          boxShadow: '0 4px 16px rgba(34,197,94,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-        }}>
-          <MapPin className="w-4 h-4 text-green-600" />
-          <span className="text-green-600 font-medium text-sm">Activity Package</span>
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-green-50 rounded-xl mb-4 border border-green-200">
+          <MapPin className="w-5 h-5 text-green-600" />
+          <span className="text-green-600 font-medium">Activity Package</span>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           {mode === 'create' ? 'Create Your Activity Package' : 'Edit Activity Package'}
@@ -721,21 +714,17 @@ export function ActivityPackageForm({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="backdrop-blur-xl rounded-2xl border border-white/20 p-2"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-        }}
+        className="bg-white rounded-2xl border border-gray-200 p-2 shadow-lg"
       >
-        <div className="flex space-x-1">
+        <div className="flex space-x-2">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+              className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
                 activeTab === tab.id
-                  ? 'bg-white/20 text-green-600 shadow-lg'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/10'
+                  ? 'bg-green-50 text-green-600 border border-green-200'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -751,11 +740,7 @@ export function ActivityPackageForm({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="backdrop-blur-xl rounded-2xl border border-white/20 p-6"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)'
-        }}
+        className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg"
       >
         {activeTab === 'basic' && renderBasicInfo()}
         {activeTab === 'details' && renderActivityDetails()}
