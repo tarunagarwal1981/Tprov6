@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useReducer, useCallback, ReactNode, useRef, useEffect } from 'react';
+import { createContext, useContext, useReducer, useCallback, ReactNode, useRef, useEffect, useState } from 'react';
 
 // ===== LOADING STATE INTERFACE =====
 interface LoadingState {
@@ -182,7 +182,7 @@ export function LoadingProvider({ children }: LoadingProviderProps) {
   }, [state.operations]);
 
   // ===== WITH LOADING WRAPPER =====
-  const withLoading = useCallback(async <T>(
+  const withLoading = useCallback(async <T,>(
     operation: () => Promise<T>,
     operationKey?: string
   ): Promise<T> => {
