@@ -18,7 +18,8 @@ import {
   Calendar,
   DollarSign,
   CheckCircle,
-  Upload
+  Upload,
+  Shield
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -62,25 +63,42 @@ interface PackageFormData {
   // Transfer specific
   from?: string;
   to?: string;
+  transferType?: 'ONEWAY' | 'TWOWAY';
+  transferServiceType?: string;
+  distanceKm?: number;
+  estimatedDuration?: string;
+  advanceBookingHours?: number;
 
   // Activity specific
   timing?: string;
   durationHours?: number;
+  activityCategory?: string;
+  difficulty?: string;
+  ageRestrictions?: string;
+  availableDays?: string[];
+  operationalHours?: string;
+  meetingPoint?: string;
+  emergencyContact?: string;
+  transferOptions?: string[];
+  maxCapacity?: number;
+  languagesSupported?: string[];
+  accessibilityInfo?: string;
+  importantInfo?: string;
+  faq?: string;
+  variants?: ActivityVariant[];
+  cancellationPolicyText?: string;
+  termsAndConditions?: string;
+}
 
-  // Package specific
-  additionalNotes?: string;
-  destinations?: string[];
-  days?: number;
-  maxGroupSize?: number;
-
-  // Arrays - ensure they're always arrays
+interface ActivityVariant {
+  id?: string;
+  variantName: string;
+  priceAdult: number;
+  priceChild: number;
+  description?: string;
+  maxCapacity?: number;
   inclusions?: string[];
   exclusions?: string[];
-  tourInclusions?: string[];
-  tourExclusions?: string[];
-  itinerary?: DayItinerary[];
-  hotels?: HotelInfo[];
-  pricing?: PricingInfo[];
 }
 
 // Helper function to ensure arrays
@@ -739,24 +757,31 @@ const DestinationsManager = ({ destinations, onChange }: {
 };
 
 export default function ImprovedPackageEditPage() {
+  console.log('🚀 ImprovedPackageEditPage component function called');
+  
   const router = useRouter();
   const searchParams = useSearchParams();
   const [packageData, setPackageData] = useState<PackageFormData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'itinerary' | 'pricing'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'variants' | 'policies'>('basic');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
 
   const packageId = searchParams.get('id');
+  
+  console.log('🚀 PackageEditPage loaded with ID:', packageId);
+  console.log('🚀 Search params:', searchParams.toString());
 
   const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
     setToast({ message, type });
   };
 
   useEffect(() => {
+    console.log('🔄 useEffect triggered for package fetch');
     const fetchPackage = async () => {
       if (!packageId) {
+        console.log('❌ No package ID provided');
         setError('No package ID provided');
         setLoading(false);
         return;
@@ -778,6 +803,7 @@ export default function ImprovedPackageEditPage() {
           .maybeSingle();
 
         console.log('📦 Package fetch result:', { packageRow, fetchError });
+        console.log('🔍 Package type from DB:', packageRow?.type);
 
         if (fetchError) {
           console.error('❌ Database error:', fetchError);
@@ -796,34 +822,35 @@ export default function ImprovedPackageEditPage() {
           name: packageRow.title || '',
           description: packageRow.description || '',
           status: packageRow.status || 'DRAFT',
-          place: packageRow.place || '',
-          from: packageRow.from_location || '',
-          to: packageRow.to_location || '',
+          
+          // Activity specific fields
           timing: packageRow.timing || '',
           durationHours: packageRow.duration_hours || 0,
           days: packageRow.duration_days || 0,
           maxGroupSize: packageRow.max_group_size || 0,
-          additionalNotes: packageRow.additional_notes || '',
+          activityCategory: packageRow.activity_category || '',
+          difficulty: packageRow.difficulty || '',
+          availableDays: ensureArray(packageRow.available_days || []),
+          operationalHours: packageRow.operational_hours ? JSON.stringify(packageRow.operational_hours) : '',
+          meetingPoint: packageRow.meeting_point || '',
+          emergencyContact: packageRow.emergency_contact ? JSON.stringify(packageRow.emergency_contact) : '',
+          transferOptions: ensureArray(packageRow.transfer_options || []),
+          maxCapacity: packageRow.max_capacity || 0,
+          languagesSupported: ensureArray(packageRow.languages_supported || []),
+          accessibilityInfo: packageRow.accessibility_info ? JSON.stringify(packageRow.accessibility_info) : '',
+          ageRestrictions: packageRow.age_restrictions ? JSON.stringify(packageRow.age_restrictions) : '',
+          importantInfo: packageRow.important_info || '',
+          faq: packageRow.faq ? JSON.stringify(packageRow.faq) : '',
+          cancellationPolicyText: packageRow.cancellation_policy_text || '',
+          termsAndConditions: packageRow.terms_and_conditions || '',
 
           destinations: ensureArray(safeJsonParse(packageRow.destinations, [])),
           inclusions: ensureArray(safeJsonParse(packageRow.inclusions, [])),
           exclusions: ensureArray(safeJsonParse(packageRow.exclusions, [])),
-          tourInclusions: ensureArray(safeJsonParse(packageRow.tour_inclusions, [])),
-          tourExclusions: ensureArray(safeJsonParse(packageRow.tour_exclusions, [])),
-          itinerary: ensureArray(safeJsonParse(packageRow.itinerary, [])),
-          hotels: ensureArray(safeJsonParse(packageRow.hotels, [])),
-
-          pricing: packageRow.pricing_slabs ?
-            ensureArray(safeJsonParse(packageRow.pricing_slabs, [])) :
-            [{
-              adultPrice: packageRow.adult_price || 0,
-              childPrice: packageRow.child_price || 0,
-              validFrom: packageRow.valid_from || '',
-              validTo: packageRow.valid_to || ''
-            }]
         };
 
         console.log('✅ Transformed package data:', transformedData);
+        console.log('🔍 Package type in transformed data:', transformedData.type);
         setPackageData(transformedData);
 
       } catch (err: any) {
@@ -836,6 +863,8 @@ export default function ImprovedPackageEditPage() {
 
     fetchPackage();
   }, [packageId]);
+  
+  console.log('🔄 Component render - loading:', loading, 'packageData:', !!packageData, 'error:', error);
 
   const updatePackageData = (updates: Partial<PackageFormData>) => {
     setPackageData(prev => prev ? {
@@ -844,11 +873,11 @@ export default function ImprovedPackageEditPage() {
       destinations: updates.destinations ? ensureArray(updates.destinations) : prev.destinations,
       inclusions: updates.inclusions ? ensureArray(updates.inclusions) : prev.inclusions,
       exclusions: updates.exclusions ? ensureArray(updates.exclusions) : prev.exclusions,
-      tourInclusions: updates.tourInclusions ? ensureArray(updates.tourInclusions) : prev.tourInclusions,
-      tourExclusions: updates.tourExclusions ? ensureArray(updates.tourExclusions) : prev.tourExclusions,
-      itinerary: updates.itinerary ? ensureArray(updates.itinerary) : prev.itinerary,
-      hotels: updates.hotels ? ensureArray(updates.hotels) : prev.hotels,
-      pricing: updates.pricing ? ensureArray(updates.pricing) : prev.pricing,
+      // tourInclusions: updates.tourInclusions ? ensureArray(updates.tourInclusions) : prev.tourInclusions, // Removed - column doesn't exist
+      // tourExclusions: updates.tourExclusions ? ensureArray(updates.tourExclusions) : prev.tourExclusions, // Removed - column doesn't exist
+      // itinerary: updates.itinerary ? ensureArray(updates.itinerary) : prev.itinerary, // Removed - column doesn't exist
+      // hotels: updates.hotels ? ensureArray(updates.hotels) : prev.hotels, // Removed - column doesn't exist
+      // pricing: updates.pricing ? ensureArray(updates.pricing) : prev.pricing, // Removed - using variants for activities
     } : null);
   };
 
@@ -858,45 +887,59 @@ export default function ImprovedPackageEditPage() {
     try {
       setSaving(true);
       console.log('💾 Saving package updates:', packageData);
+      console.log('🔍 Package type:', packageData.type);
+      console.log('🔍 Package data keys:', Object.keys(packageData));
+      // console.log('🔍 Pricing data:', packageData.pricing); // Removed - using variants for activities
+      // console.log('🔍 Vehicle configs:', packageData.vehicleConfigs); // Removed - not used for activities
 
       const updateData = {
         title: packageData.title || packageData.name || '',
         description: packageData.description || '',
         status: packageData.status || 'DRAFT',
         type: packageData.type,
-        place: packageData.place || null,
-        from_location: packageData.from || null,
-        to_location: packageData.to || null,
+        
+        // Activity specific fields
         timing: packageData.timing || null,
         duration_hours: packageData.durationHours || 0,
         duration_days: packageData.days || 0,
         max_group_size: packageData.maxGroupSize || null,
-        additional_notes: packageData.additionalNotes || null,
+        activity_category: packageData.activityCategory || null,
+        difficulty: packageData.difficulty || null,
+        available_days: packageData.availableDays && packageData.availableDays.length > 0 ? packageData.availableDays : null,
+        operational_hours: packageData.operationalHours ? JSON.parse(packageData.operationalHours) : null,
+        meeting_point: packageData.meetingPoint || null,
+        emergency_contact: packageData.emergencyContact ? JSON.parse(packageData.emergencyContact) : null,
+        transfer_options: packageData.transferOptions && packageData.transferOptions.length > 0 ? packageData.transferOptions : null,
+        max_capacity: packageData.maxCapacity || null,
+        languages_supported: packageData.languagesSupported && packageData.languagesSupported.length > 0 ? packageData.languagesSupported : null,
+        accessibility_info: packageData.accessibilityInfo ? JSON.parse(packageData.accessibilityInfo) : null,
+        age_restrictions: packageData.ageRestrictions ? JSON.parse(packageData.ageRestrictions) : null,
+        important_info: packageData.importantInfo || null,
+        faq: packageData.faq ? JSON.parse(packageData.faq) : null,
+        cancellation_policy_text: packageData.cancellationPolicyText || null,
+        terms_and_conditions: packageData.termsAndConditions || null,
 
         destinations: packageData.destinations && packageData.destinations.length > 0 ?
-          JSON.stringify(packageData.destinations) : null,
+          packageData.destinations : null,
         inclusions: packageData.inclusions && packageData.inclusions.length > 0 ?
-          JSON.stringify(packageData.inclusions) : null,
+          packageData.inclusions : null,
         exclusions: packageData.exclusions && packageData.exclusions.length > 0 ?
-          JSON.stringify(packageData.exclusions) : null,
-        tour_inclusions: packageData.tourInclusions && packageData.tourInclusions.length > 0 ?
-          JSON.stringify(packageData.tourInclusions) : null,
-        tour_exclusions: packageData.tourExclusions && packageData.tourExclusions.length > 0 ?
-          JSON.stringify(packageData.tourExclusions) : null,
-        itinerary: packageData.itinerary && packageData.itinerary.length > 0 ?
-          JSON.stringify(packageData.itinerary) : null,
-        hotels: packageData.hotels && packageData.hotels.length > 0 ?
-          JSON.stringify(packageData.hotels) : null,
-
-        pricing_slabs: packageData.pricing && packageData.pricing.length > 0 ?
-          JSON.stringify(packageData.pricing) : null,
-        adult_price: packageData.pricing?.[0]?.adultPrice || 0,
-        child_price: packageData.pricing?.[0]?.childPrice || 0,
+          packageData.exclusions : null,
 
         updated_at: new Date().toISOString()
       };
 
       console.log('🔄 Update payload:', updateData);
+      console.log('🔍 Array fields being sent:');
+      console.log('destinations:', updateData.destinations, 'type:', typeof updateData.destinations);
+      console.log('inclusions:', updateData.inclusions, 'type:', typeof updateData.inclusions);
+      console.log('exclusions:', updateData.exclusions, 'type:', typeof updateData.exclusions);
+      console.log('available_days:', updateData.available_days, 'type:', typeof updateData.available_days);
+      console.log('transfer_options:', updateData.transfer_options, 'type:', typeof updateData.transfer_options);
+      console.log('languages_supported:', updateData.languages_supported, 'type:', typeof updateData.languages_supported);
+      // console.log('🔍 Pricing slabs being sent:', updateData.pricing_slabs); // Removed - column doesn't exist
+      // console.log('🔍 Adult price being sent:', updateData.adult_price); // Removed - using variants for activities
+      // console.log('🔍 Child price being sent:', updateData.child_price); // Removed - using variants for activities
 
       const { error: updateError } = await supabase
         .from('packages')
@@ -905,6 +948,7 @@ export default function ImprovedPackageEditPage() {
 
       if (updateError) {
         console.error('❌ Update error:', updateError);
+        console.error('❌ Update error details:', JSON.stringify(updateError, null, 2));
         throw updateError;
       }
 
@@ -917,6 +961,8 @@ export default function ImprovedPackageEditPage() {
 
     } catch (err: any) {
       console.error('💥 Error saving package:', err);
+      console.error('💥 Error stack:', err?.stack);
+      console.error('💥 Error details:', JSON.stringify(err, null, 2));
       showToast(err?.message || 'Failed to save package', 'error');
       setError(err?.message || 'Failed to save package');
     } finally {
@@ -974,10 +1020,14 @@ export default function ImprovedPackageEditPage() {
 
   const tabs = [
     { id: 'basic', label: 'Basic Info', icon: FileText },
-    { id: 'details', label: 'Details', icon: Package },
-    { id: 'itinerary', label: 'Itinerary', icon: Calendar },
-    { id: 'pricing', label: 'Pricing', icon: DollarSign }
+    { id: 'details', label: 'Activity Details', icon: Package },
+    { id: 'variants', label: 'Variants', icon: DollarSign },
+    { id: 'policies', label: 'Policies', icon: Shield }
   ];
+  
+  console.log('🔍 Package type for tabs:', packageData.type);
+  console.log('🔍 Is transfers package?', packageData.type === PackageType.TRANSFERS);
+  console.log('🔍 Tabs array:', tabs);
 
   const statusOptions = [
     { value: 'DRAFT', label: 'Draft' },
@@ -1093,7 +1143,7 @@ export default function ImprovedPackageEditPage() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as 'basic' | 'details' | 'itinerary' | 'pricing')}
+                    onClick={() => setActiveTab(tab.id as any)}
                     className={cn(
                       "flex items-center gap-2 py-4 px-4 border-b-3 font-medium text-sm transition-all duration-300 rounded-t-xl",
                       activeTab === tab.id
@@ -1158,54 +1208,56 @@ export default function ImprovedPackageEditPage() {
                   </div>
 
                   {packageData.type === PackageType.TRANSFERS && (
-                    <>
-                      <FormField label="Place/Destination" required>
-                        <Select
-                          value={packageData.place || ''}
-                          onChange={(value) => updatePackageData({ place: value })}
-                          options={[
-                            { value: 'mumbai', label: 'Mumbai' },
-                            { value: 'delhi', label: 'Delhi' },
-                            { value: 'bangalore', label: 'Bangalore' },
-                            { value: 'goa', label: 'Goa' },
-                            { value: 'kerala', label: 'Kerala' }
-                          ]}
-                          placeholder="Select destination"
-                        />
-                      </FormField>
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField label="From Location" required>
-                          <Input
-                            placeholder="Starting location"
-                            value={packageData.from || ''}
-                            onChange={(value) => updatePackageData({ from: value })}
-                          />
-                        </FormField>
-                        <FormField label="To Location" required>
-                          <Input
-                            placeholder="Destination"
-                            value={packageData.to || ''}
-                            onChange={(value) => updatePackageData({ to: value })}
-                          />
-                        </FormField>
+                    <div className="text-center py-8">
+                      <p className="text-gray-600 mb-4">Transfers packages use a specialized form.</p>
+                      <button
+                        onClick={() => {
+                          console.log('🚀 Redirecting to transfers edit page for ID:', packageId);
+                          window.location.href = `/operator/packages/transfers/edit?id=${packageId}`;
+                        }}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Open Transfers Edit Form
+                      </button>
                       </div>
-                    </>
                   )}
 
                   {packageData.type === PackageType.ACTIVITY && (
                     <>
-                      <FormField label="Place/Destination" required>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField label="Activity Category">
                         <Select
+                            value={packageData.activityCategory || ''}
+                            onChange={(value) => updatePackageData({ activityCategory: value })}
+                          options={[
+                              { value: 'ADVENTURE', label: 'Adventure' },
+                              { value: 'CULTURAL', label: 'Cultural' },
+                              { value: 'NATURE', label: 'Nature' },
+                              { value: 'SPORTS', label: 'Sports' },
+                              { value: 'ENTERTAINMENT', label: 'Entertainment' }
+                            ]}
+                            placeholder="Select activity category"
+                        />
+                      </FormField>
+                        <FormField label="Difficulty Level">
+                          <Select
+                            value={packageData.difficulty || ''}
+                            onChange={(value) => updatePackageData({ difficulty: value })}
+                            options={[
+                              { value: 'EASY', label: 'Easy' },
+                              { value: 'MODERATE', label: 'Moderate' },
+                              { value: 'CHALLENGING', label: 'Challenging' },
+                              { value: 'EXPERT', label: 'Expert' }
+                            ]}
+                            placeholder="Select difficulty level"
+                          />
+                        </FormField>
+                      </div>
+                      <FormField label="Place/Destination" required>
+                        <Input
+                          placeholder="Enter destination name"
                           value={packageData.place || ''}
                           onChange={(value) => updatePackageData({ place: value })}
-                          options={[
-                            { value: 'mumbai', label: 'Mumbai' },
-                            { value: 'delhi', label: 'Delhi' },
-                            { value: 'bangalore', label: 'Bangalore' },
-                            { value: 'goa', label: 'Goa' },
-                            { value: 'kerala', label: 'Kerala' }
-                          ]}
-                          placeholder="Select destination"
                         />
                       </FormField>
                       <div className="grid grid-cols-2 gap-4">
@@ -1222,6 +1274,23 @@ export default function ImprovedPackageEditPage() {
                             placeholder="e.g., 8"
                             value={packageData.durationHours || 0}
                             onChange={(value) => updatePackageData({ durationHours: parseInt(value) || 0 })}
+                          />
+                        </FormField>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField label="Max Group Size">
+                          <Input
+                            type="number"
+                            placeholder="e.g., 20"
+                            value={packageData.maxGroupSize || 0}
+                            onChange={(value) => updatePackageData({ maxGroupSize: parseInt(value) || 0 })}
+                          />
+                        </FormField>
+                        <FormField label="Age Restrictions">
+                          <Input
+                            placeholder="e.g., 12+ years"
+                            value={packageData.ageRestrictions || ''}
+                            onChange={(value) => updatePackageData({ ageRestrictions: value })}
                           />
                         </FormField>
                       </div>
@@ -1335,35 +1404,37 @@ export default function ImprovedPackageEditPage() {
                 </motion.div>
               )}
 
-              {activeTab === 'itinerary' && (
+              {activeTab === 'variants' && (
                 <motion.div
-                  key="itinerary"
+                  key="variants"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  <FormField label="Day-wise Itinerary">
-                    <ItineraryManager
-                      itinerary={packageData.itinerary || []}
-                      onChange={(items) => updatePackageData({ itinerary: items })}
-                    />
+                  <FormField label="Package Variants">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-4">Package Variants</h3>
+                      <p className="text-gray-600">Variants management will be implemented here.</p>
+                    </div>
                   </FormField>
                 </motion.div>
               )}
 
-              {activeTab === 'pricing' && (
+              {activeTab === 'policies' && (
                 <motion.div
-                  key="pricing"
+                  key="policies"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  <PricingSection
-                    pricing={packageData.pricing || []}
-                    onChange={(items) => updatePackageData({ pricing: items })}
-                  />
+                  <FormField label="Policies">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-4">Policies</h3>
+                      <p className="text-gray-600">Policies management will be implemented here.</p>
+                    </div>
+                  </FormField>
                 </motion.div>
               )}
             </AnimatePresence>

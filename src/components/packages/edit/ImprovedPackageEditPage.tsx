@@ -62,6 +62,11 @@ interface PackageFormData {
   // Transfer specific
   from?: string;
   to?: string;
+  transferType?: 'ONEWAY' | 'TWOWAY';
+  transferServiceType?: string;
+  distanceKm?: number;
+  estimatedDuration?: string;
+  advanceBookingHours?: number;
 
   // Activity specific
   timing?: string;
@@ -756,6 +761,11 @@ export default function ImprovedPackageEditPage() {
           place: packageRow.place || '',
           from: packageRow.from_location || '',
           to: packageRow.to_location || '',
+          transferType: packageRow.transfer_type || 'ONEWAY',
+          transferServiceType: packageRow.transfer_service_type || '',
+          distanceKm: packageRow.distance_km || 0,
+          estimatedDuration: packageRow.estimated_duration || '',
+          advanceBookingHours: packageRow.advance_booking_hours || 24,
           timing: packageRow.timing || '',
           durationHours: packageRow.duration_hours || 0,
           days: packageRow.duration_days || 0,
@@ -815,6 +825,10 @@ export default function ImprovedPackageEditPage() {
     try {
       setSaving(true);
       console.log('💾 Saving package updates:', packageData);
+      console.log('🔍 Package type:', packageData.type);
+      console.log('🔍 Package data keys:', Object.keys(packageData));
+      console.log('🔍 Pricing data:', packageData.pricing);
+      console.log('🔍 Vehicle configs:', packageData.vehicleConfigs);
 
       const updateData = {
         title: packageData.title || packageData.name || '',
@@ -824,6 +838,10 @@ export default function ImprovedPackageEditPage() {
         place: packageData.place || null,
         from_location: packageData.from || null,
         to_location: packageData.to || null,
+        transfer_service_type: packageData.transferServiceType || null,
+        distance_km: packageData.distanceKm || null,
+        estimated_duration: packageData.estimatedDuration || null,
+        advance_booking_hours: packageData.advanceBookingHours || null,
         timing: packageData.timing || null,
         duration_hours: packageData.durationHours || 0,
         duration_days: packageData.days || 0,
@@ -854,6 +872,9 @@ export default function ImprovedPackageEditPage() {
       };
 
       console.log('🔄 Update payload:', updateData);
+      console.log('🔍 Pricing slabs being sent:', updateData.pricing_slabs);
+      console.log('🔍 Adult price being sent:', updateData.adult_price);
+      console.log('🔍 Child price being sent:', updateData.child_price);
 
       const { error: updateError } = await supabase
         .from('packages')
@@ -862,6 +883,7 @@ export default function ImprovedPackageEditPage() {
 
       if (updateError) {
         console.error('❌ Update error:', updateError);
+        console.error('❌ Update error details:', JSON.stringify(updateError, null, 2));
         throw updateError;
       }
 
@@ -874,6 +896,8 @@ export default function ImprovedPackageEditPage() {
 
     } catch (err: any) {
       console.error('💥 Error saving package:', err);
+      console.error('💥 Error stack:', err?.stack);
+      console.error('💥 Error details:', JSON.stringify(err, null, 2));
       showToast(err?.message || 'Failed to save package', 'error');
       setError(err?.message || 'Failed to save package');
     } finally {
@@ -933,7 +957,7 @@ export default function ImprovedPackageEditPage() {
     { id: 'basic', label: 'Basic Info', icon: FileText },
     { id: 'details', label: 'Details', icon: Package },
     { id: 'itinerary', label: 'Itinerary', icon: Calendar },
-    { id: 'pricing', label: 'Pricing', icon: DollarSign }
+    ...(packageData.type !== PackageType.TRANSFERS ? [{ id: 'pricing', label: 'Pricing', icon: DollarSign }] : [])
   ];
 
   const statusOptions = [
@@ -1025,7 +1049,7 @@ export default function ImprovedPackageEditPage() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as 'basic' | 'details' | 'itinerary' | 'pricing')}
+                    onClick={() => setActiveTab(tab.id as any)}
                     className={cn(
                       "flex items-center gap-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors",
                       activeTab === tab.id
@@ -1090,38 +1114,15 @@ export default function ImprovedPackageEditPage() {
                   </div>
 
                   {packageData.type === PackageType.TRANSFERS && (
-                    <>
-                      <FormField label="Place/Destination" required>
-                        <Select
-                          value={packageData.place || ''}
-                          onChange={(value) => updatePackageData({ place: value })}
-                          options={[
-                            { value: 'mumbai', label: 'Mumbai' },
-                            { value: 'delhi', label: 'Delhi' },
-                            { value: 'bangalore', label: 'Bangalore' },
-                            { value: 'goa', label: 'Goa' },
-                            { value: 'kerala', label: 'Kerala' }
-                          ]}
-                          placeholder="Select destination"
-                        />
-                      </FormField>
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField label="From Location" required>
-                          <Input
-                            placeholder="Starting location"
-                            value={packageData.from || ''}
-                            onChange={(value) => updatePackageData({ from: value })}
-                          />
-                        </FormField>
-                        <FormField label="To Location" required>
-                          <Input
-                            placeholder="Destination"
-                            value={packageData.to || ''}
-                            onChange={(value) => updatePackageData({ to: value })}
-                          />
-                        </FormField>
+                    <div className="text-center py-8">
+                      <p className="text-gray-600 mb-4">Transfers packages use a specialized form.</p>
+                      <button
+                        onClick={() => window.location.href = `/operator/packages/transfers/edit?id=${packageId}`}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Open Transfers Edit Form
+                      </button>
                       </div>
-                    </>
                   )}
 
                   {packageData.type === PackageType.ACTIVITY && (
@@ -1284,7 +1285,7 @@ export default function ImprovedPackageEditPage() {
                 </motion.div>
               )}
 
-              {activeTab === 'pricing' && (
+              {activeTab === 'pricing' && packageData.type !== PackageType.TRANSFERS && (
                 <motion.div
                   key="pricing"
                   initial={{ opacity: 0, x: 20 }}

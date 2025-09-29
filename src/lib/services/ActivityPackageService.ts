@@ -40,10 +40,14 @@ export class ActivityPackageService {
    */
   static async createActivityPackage(
     tourOperatorId: string,
-    packageData: ActivityPackageData
+    packageData: ActivityPackageData,
+    imageFile?: File,
+    status: 'DRAFT' | 'ACTIVE' = 'DRAFT'
   ): Promise<{ success: boolean; packageId?: string; error?: string }> {
     try {
       console.log('🚀 Creating activity package...', packageData);
+      console.log('📸 Image file:', imageFile?.name);
+      console.log('📊 Status:', status);
 
       // 1. Insert main package with activity-specific fields
       const packageInsert = {
@@ -51,7 +55,7 @@ export class ActivityPackageService {
         title: packageData.title,
         description: packageData.description,
         type: 'ACTIVITY',
-        status: 'DRAFT',
+        status: status,
         
         // Basic fields
         adult_price: packageData.pricing?.[0]?.adultPrice || 0,
@@ -133,6 +137,24 @@ export class ActivityPackageService {
           console.warn('⚠️ Package created but variants failed to save');
         } else {
           console.log('✅ Package variants created successfully');
+        }
+      }
+
+      // Upload and save image if provided
+      if (imageFile) {
+        console.log('📸 Uploading activity package image...');
+        const { ImageService } = await import('./imageService');
+        const imageResult = await ImageService.uploadAndSavePackageImage(
+          imageFile, 
+          packageId, 
+          true, // isPrimary
+          0 // order
+        );
+        
+        if (!imageResult.success) {
+          console.warn('⚠️ Image upload failed, but package was created:', imageResult.error);
+        } else {
+          console.log('✅ Activity package image uploaded successfully:', imageResult.url);
         }
       }
 

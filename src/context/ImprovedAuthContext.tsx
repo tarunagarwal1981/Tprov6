@@ -129,6 +129,7 @@ export function ImprovedAuthProvider({ children }: AuthProviderProps) {
   const sessionRefreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const profileCacheRef = useRef<Map<string, User>>(new Map()); // Add profile caching
   const lastProcessedEventRef = useRef<string>(''); // Track last processed event to prevent duplicates
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Add loading timeout
 
   // ===== LOAD USER PROFILE WITH IMPROVED ERROR HANDLING =====
   const loadUserProfile = useCallback(async (supabaseUser: SupabaseUser): Promise<User | null> => {
@@ -164,7 +165,7 @@ export function ImprovedAuthProvider({ children }: AuthProviderProps) {
         .single();
       
       const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Profile loading timeout')), 8000) // Reduced to 8 seconds
+        setTimeout(() => reject(new Error('Profile loading timeout')), 5000) // Reduced to 5 seconds
       );
       
       const { data: userProfile, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
@@ -258,6 +259,12 @@ export function ImprovedAuthProvider({ children }: AuthProviderProps) {
     if (initializationRef.current) return;
     initializationRef.current = true;
 
+    // Set a global loading timeout to prevent infinite loading
+    loadingTimeoutRef.current = setTimeout(() => {
+      console.warn('🚨 AuthContext: Global loading timeout reached, forcing loading to false');
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }, 8000); // 8 second global timeout
+
     const initializeAuth = async () => {
       try {
         console.log('🚀 Initializing authentication...');
@@ -265,7 +272,7 @@ export function ImprovedAuthProvider({ children }: AuthProviderProps) {
         // Get initial session with longer timeout and better error handling
         const sessionPromise = supabase.auth.getSession();
         const timeoutPromise = new Promise<never>((_, reject) => 
-          setTimeout(() => reject(new Error('Session initialization timeout')), 10000) // Reduced to 10 seconds
+          setTimeout(() => reject(new Error('Session initialization timeout')), 5000) // Reduced to 5 seconds
         );
         
         const { data: { session }, error } = await Promise.race([sessionPromise, timeoutPromise]);
@@ -318,6 +325,12 @@ export function ImprovedAuthProvider({ children }: AuthProviderProps) {
         }
 
         console.log('✅ Authentication initialized successfully');
+        
+        // Clear the global loading timeout since initialization is complete
+        if (loadingTimeoutRef.current) {
+          clearTimeout(loadingTimeoutRef.current);
+          loadingTimeoutRef.current = null;
+        }
 
       } catch (error) {
         console.error('❌ Error initializing auth:', error);
@@ -330,6 +343,12 @@ export function ImprovedAuthProvider({ children }: AuthProviderProps) {
           } 
         });
         dispatch({ type: 'SET_ERROR', payload: 'Failed to initialize authentication' });
+        
+        // Clear the global loading timeout on error
+        if (loadingTimeoutRef.current) {
+          clearTimeout(loadingTimeoutRef.current);
+          loadingTimeoutRef.current = null;
+        }
       }
     };
 
@@ -474,6 +493,9 @@ export function ImprovedAuthProvider({ children }: AuthProviderProps) {
       subscription.unsubscribe();
       if (sessionRefreshTimeoutRef.current) {
         clearTimeout(sessionRefreshTimeoutRef.current);
+      }
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
       }
     };
   }, []);

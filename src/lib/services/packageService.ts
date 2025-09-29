@@ -51,14 +51,24 @@ export class PackageService {
   // Create a new package
   async createPackage(packageData: DbPackageInsert): Promise<ServiceResponse<DbPackage>> {
     try {
+      console.log('📦 PackageService: Creating package with data:', {
+        title: packageData.title,
+        type: packageData.type,
+        status: packageData.status,
+        tourOperatorId: packageData.tour_operator_id,
+      });
+      
       const { data, error } = await PackageService.createPackageStatic(packageData);
       
       if (error) {
+        console.error('❌ PackageService: Error creating package:', error);
         return { data: null as any, success: false, error: error.message || 'Failed to create package' };
       }
       
+      console.log('✅ PackageService: Package created successfully:', data?.id);
       return { data: data!, success: true, message: 'Package created successfully' };
     } catch (error) {
+      console.error('❌ PackageService: Exception creating package:', error);
       return { 
         data: null as any, 
         success: false, 
@@ -338,16 +348,29 @@ export class PackageService {
   // Static methods from the original PackageService (for backward compatibility)
   static async createPackageStatic(packageData: DbPackageInsert): Promise<SupabaseResponse<DbPackage>> {
     try {
+      console.log('🔧 PackageService: Static createPackage called with:', {
+        title: packageData.title,
+        type: packageData.type,
+        status: packageData.status,
+        hasTransferServices: !!packageData.transfer_services,
+        hasActivities: !!packageData.activities,
+      });
+      
       const { data, error } = await supabase
         .from('packages')
         .insert(packageData)
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ PackageService: Supabase error creating package:', error);
+        throw error;
+      }
+      
+      console.log('✅ PackageService: Static createPackage successful:', data?.id);
       return { data, error: null }
     } catch (error) {
-      console.error('Error creating package:', error)
+      console.error('❌ PackageService: Exception in static createPackage:', error)
       return { data: null, error }
     }
   }
@@ -584,9 +607,15 @@ export class PackageService {
   }
 
   // Enhanced transfer package methods
-  async createTransferPackageWithVehicles(packageData: DbPackageInsert, vehicleConfigs: VehicleConfig[]): Promise<ServiceResponse<DbPackage>> {
+  async createTransferPackageWithVehicles(packageData: DbPackageInsert, vehicleConfigs: VehicleConfig[], imageFile?: File): Promise<ServiceResponse<DbPackage>> {
     try {
+      console.log('🚗 PackageService: createTransferPackageWithVehicles called');
+      console.log('📦 Package data:', packageData);
+      console.log('🚗 Vehicle configs:', vehicleConfigs);
+      console.log('📸 Image file:', imageFile?.name);
+      
       // Start a transaction
+      console.log('🔄 Starting package creation...');
       const { data: packageResult, error: packageError } = await supabase
         .from('packages')
         .insert(packageData)
@@ -594,6 +623,7 @@ export class PackageService {
         .single();
 
       if (packageError) {
+        console.error('❌ PackageService: Package creation failed:', packageError);
         return { 
           data: null as any, 
           success: false, 
@@ -601,8 +631,11 @@ export class PackageService {
         };
       }
 
+      console.log('✅ PackageService: Package created successfully:', packageResult.id);
+
       // Insert vehicle configurations
       if (vehicleConfigs.length > 0) {
+        console.log('🚗 Inserting vehicle configurations...');
         const vehicleConfigsData = vehicleConfigs.map((config, index) => ({
           transfer_package_id: packageResult.id,
           vehicle_type: config.vehicleType,
@@ -619,12 +652,16 @@ export class PackageService {
           order_index: index
         }));
 
+        console.log('🚗 Vehicle configs data to insert:', vehicleConfigsData);
+
         const { error: vehicleError } = await supabase
           .from('transfer_vehicle_configs')
           .insert(vehicleConfigsData);
 
         if (vehicleError) {
+          console.error('❌ PackageService: Vehicle configs insertion failed:', vehicleError);
           // Rollback package creation
+          console.log('🔄 Rolling back package creation...');
           await supabase.from('packages').delete().eq('id', packageResult.id);
           return { 
             data: null as any, 
@@ -632,14 +669,36 @@ export class PackageService {
             error: vehicleError.message 
           };
         }
+        
+        console.log('✅ PackageService: Vehicle configs inserted successfully');
       }
 
+      // Upload and save image if provided
+      if (imageFile) {
+        console.log('📸 Uploading package image...');
+        const { ImageService } = await import('./imageService');
+        const imageResult = await ImageService.uploadAndSavePackageImage(
+          imageFile, 
+          packageResult.id, 
+          true, // isPrimary
+          0 // order
+        );
+        
+        if (!imageResult.success) {
+          console.warn('⚠️ Image upload failed, but package was created:', imageResult.error);
+        } else {
+          console.log('✅ Package image uploaded successfully:', imageResult.url);
+        }
+      }
+
+      console.log('🎉 PackageService: Transfer package with vehicles created successfully');
       return { 
         data: packageResult, 
         success: true, 
         message: 'Transfer package created successfully' 
       };
     } catch (error) {
+      console.error('💥 PackageService: Exception in createTransferPackageWithVehicles:', error);
       return { 
         data: null as any, 
         success: false, 

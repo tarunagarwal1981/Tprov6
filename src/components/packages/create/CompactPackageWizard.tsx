@@ -35,6 +35,7 @@ import {
   Coffee,
   Luggage
 } from 'lucide-react';
+import { ActivityPackageForm } from '@/components/packages/activities/ActivityPackageForm';
 
 // Import the new activity form components
 import ActivityDetailsForm from '@/components/packages/forms/ActivityDetailsForm';
@@ -2325,6 +2326,8 @@ const FixedDepartureForm = ({ data, onChange }: FormProps) => {
 
 // Inner component that uses toast
 function CompactPackageWizardContent() {
+  console.log('🚀 CompactPackageWizardContent component loaded');
+  console.log('🚀 CompactPackageWizardContent: About to initialize hooks');
   const router = useRouter();
   const { addToast } = useToast();
   const [step, setStep] = useState<'type' | 'form'>('type');
@@ -2332,8 +2335,10 @@ function CompactPackageWizardContent() {
   const [formData, setFormData] = useState<PackageFormData>({} as PackageFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
+  console.log('🚀 CompactPackageWizardContent: Hooks initialized, step:', step, 'selectedType:', selectedType);
 
   const handleTypeSelect = (type: PackageType) => {
+    console.log('🚀 handleTypeSelect called with type:', type);
     setSelectedType(type);
     const baseFormData = {
       type, 
@@ -2348,6 +2353,7 @@ function CompactPackageWizardContent() {
 
     // Add type-specific initial data
     if (type === PackageType.TRANSFERS) {
+      console.log('🚗 Setting up TRANSFERS form data');
       setFormData({
         ...baseFormData,
         vehicleConfigs: [{
@@ -2363,12 +2369,14 @@ function CompactPackageWizardContent() {
         }]
       });
     } else {
+      console.log('📦 Setting up non-TRANSFERS form data');
       setFormData({
         ...baseFormData,
         pricing: [{ adultPrice: 0, childPrice: 0, validFrom: '', validTo: '' }]
       });
     }
     
+    console.log('🚀 Moving to form step');
     setStep('form');
     addToast('Package type selected! Let\'s create your offering.', 'success');
   };
@@ -2386,24 +2394,46 @@ function CompactPackageWizardContent() {
   };
 
   const validateForm = (): boolean => {
+    console.log('🔍 VALIDATION STARTED');
+    console.log('📋 Form data being validated:', formData);
+    console.log('📝 Package type:', formData.type);
+    
     const newErrors: Record<string, string> = {};
     
     if (!formData.name && !formData.title) {
+      console.error('❌ Validation failed: Name/Title is required');
       newErrors.name = 'Name/Title is required';
     }
 
     // Type-specific validation
     if (formData.type === PackageType.TRANSFERS) {
-      if (!formData.place) newErrors.place = 'Place is required';
-      if (!formData.from) newErrors.from = 'Starting location is required';
-      if (!formData.to) newErrors.to = 'Destination is required';
-      if (!formData.transferType) newErrors.transferType = 'Transfer type is required';
+      console.log('🚗 Validating TRANSFER package...');
+      
+      if (!formData.place) {
+        console.error('❌ Validation failed: Place is required');
+        newErrors.place = 'Place is required';
+      }
+      if (!formData.from) {
+        console.error('❌ Validation failed: Starting location is required');
+        newErrors.from = 'Starting location is required';
+      }
+      if (!formData.to) {
+        console.error('❌ Validation failed: Destination is required');
+        newErrors.to = 'Destination is required';
+      }
+      if (!formData.transferType) {
+        console.error('❌ Validation failed: Transfer type is required');
+        newErrors.transferType = 'Transfer type is required';
+      }
       if (!formData.vehicleConfigs || formData.vehicleConfigs.length === 0) {
+        console.error('❌ Validation failed: At least one vehicle configuration is required');
         newErrors.vehicleConfigs = 'At least one vehicle configuration is required';
       } else {
+        console.log('🚗 Validating vehicle configs:', formData.vehicleConfigs);
         // Validate each vehicle configuration
         formData.vehicleConfigs.forEach((config, index) => {
           if (!config.name) {
+            console.error(`❌ Validation failed: Vehicle ${index} name is required`);
             newErrors[`vehicleConfigs.${index}.name`] = 'Vehicle service name is required';
           }
           if (!config.basePrice || config.basePrice <= 0) {
@@ -2435,21 +2465,56 @@ function CompactPackageWizardContent() {
       }
     }
 
-    // Pricing validation
-    if (!formData.pricing || formData.pricing.length === 0) {
-      newErrors.pricing = 'At least one pricing slab is required';
+    // Pricing validation - skip for transfer packages (they use vehicle configs)
+    if (formData.type !== PackageType.TRANSFERS) {
+      if (formData.type === PackageType.ACTIVITY) {
+        // For activity packages, validate variants instead of pricing
+        if (!formData.variants || formData.variants.length === 0) {
+          console.error('❌ Validation failed: At least one package variant is required');
+          newErrors.variants = 'At least one package variant is required';
+        } else {
+          formData.variants.forEach((variant, index) => {
+            if (!variant.priceAdult || variant.priceAdult <= 0) {
+              console.error(`❌ Validation failed: Adult price ${index} is required`);
+              newErrors[`variants_${index}_adult`] = 'Adult price is required';
+            }
+            if (!variant.variantName) {
+              console.error(`❌ Validation failed: Variant name ${index} is required`);
+              newErrors[`variants_${index}_name`] = 'Variant name is required';
+            }
+          });
+        }
+      } else {
+        // For other package types, use legacy pricing validation
+      if (!formData.pricing || formData.pricing.length === 0) {
+        console.error('❌ Validation failed: At least one pricing slab is required');
+        newErrors.pricing = 'At least one pricing slab is required';
+      } else {
+        formData.pricing.forEach((price, index) => {
+          if (!price.adultPrice || price.adultPrice <= 0) {
+            console.error(`❌ Validation failed: Adult price ${index} is required`);
+            newErrors[`pricing_${index}_adult`] = 'Adult price is required';
+          }
+          if (!price.validFrom) {
+            console.error(`❌ Validation failed: Valid from date ${index} is required`);
+            newErrors[`pricing_${index}_from`] = 'Valid from date is required';
+          }
+          if (!price.validTo) {
+            console.error(`❌ Validation failed: Valid to date ${index} is required`);
+            newErrors[`pricing_${index}_to`] = 'Valid to date is required';
+          }
+        });
+        }
+      }
     } else {
-      formData.pricing.forEach((price, index) => {
-        if (!price.adultPrice || price.adultPrice <= 0) {
-          newErrors[`pricing_${index}_adult`] = 'Adult price is required';
-        }
-        if (!price.validFrom) {
-          newErrors[`pricing_${index}_from`] = 'Valid from date is required';
-        }
-        if (!price.validTo) {
-          newErrors[`pricing_${index}_to`] = 'Valid to date is required';
-        }
-      });
+      console.log('🚗 Skipping pricing validation for transfer package (uses vehicle configs)');
+    }
+
+    console.log('🔍 Validation completed. Errors found:', Object.keys(newErrors).length);
+    if (Object.keys(newErrors).length > 0) {
+      console.error('❌ VALIDATION ERRORS:', newErrors);
+    } else {
+      console.log('✅ VALIDATION PASSED - No errors found');
     }
 
     setErrors(newErrors);
@@ -2457,16 +2522,33 @@ function CompactPackageWizardContent() {
   };
 
   const handleSave = async (status: 'DRAFT' | 'ACTIVE' = 'DRAFT') => {
+    console.log('🚀🚀🚀 HANDLE SAVE FUNCTION CALLED 🚀🚀🚀');
+    console.log('📊 Status:', status);
+    console.log('📊 isSaving:', isSaving);
+    console.log('📊 Form data keys:', Object.keys(formData));
+    console.log('📊 Errors keys:', Object.keys(errors));
+    console.log('🚗 Selected type:', selectedType);
+    console.log('🚗 Is transfers package?', selectedType === PackageType.TRANSFERS);
+    
+    console.log('🚀 TRANSFER PACKAGE SUBMISSION STARTED');
+    console.log('📋 Form validation check...');
+    
     if (!validateForm()) {
+      console.error('❌ FORM VALIDATION FAILED');
+      console.log('🔍 Current form errors:', errors);
+      console.log('📝 Form data that failed validation:', formData);
       addToast('Please fix the errors before saving', 'error');
       return;
     }
 
+    console.log('✅ FORM VALIDATION PASSED');
     setIsSaving(true);
+    
     try {
       console.log('🚀 Starting package save process...');
       console.log('📋 Form data:', formData);
       console.log('📝 Package status:', status);
+      console.log('🔍 Package type:', formData.type);
 
       // 1) Get current user and tour_operator_id
       console.log('🔐 Getting current user...');
@@ -2482,8 +2564,14 @@ function CompactPackageWizardContent() {
         .eq('user_id', authUserId)
         .maybeSingle();
       console.log('🏢 Tour operator lookup result:', { tourOperator, error: tourOpErr });
-      if (tourOpErr) throw tourOpErr;
-      if (!tourOperator?.id) throw new Error('No tour operator profile found');
+      if (tourOpErr) {
+        console.error('❌ Tour operator lookup error:', tourOpErr);
+        throw tourOpErr;
+      }
+      if (!tourOperator?.id) {
+        console.error('❌ No tour operator profile found for user:', authUserId);
+        throw new Error('No tour operator profile found');
+      }
 
       // 2) Insert main package
       console.log('📦 Preparing main package insert...');
@@ -2492,12 +2580,16 @@ function CompactPackageWizardContent() {
         title: formData.title || formData.name || 'Untitled Package',
         description: formData.description || '',
         type: formData.type,
-        // For transfer packages, use vehicle config pricing; for others, use legacy pricing
+        // For transfer packages, use vehicle config pricing; for activities, use variants; for others, use legacy pricing
         adult_price: formData.type === 'TRANSFERS' 
           ? (formData.vehicleConfigs?.[0]?.basePrice ?? 0)
+          : formData.type === 'ACTIVITY'
+          ? (formData.variants?.[0]?.priceAdult ?? 0)
           : (formData.pricing?.[0]?.adultPrice ?? 0),
         child_price: formData.type === 'TRANSFERS' 
           ? 0 // Transfer packages don't have child pricing in legacy format
+          : formData.type === 'ACTIVITY'
+          ? (formData.variants?.[0]?.priceChild ?? 0)
           : (formData.pricing?.[0]?.childPrice ?? 0),
         duration_days: formData.days ?? 1,
         duration_hours: formData.durationHours ?? 0,
@@ -2514,13 +2606,38 @@ function CompactPackageWizardContent() {
       // Use enhanced service for transfer packages with vehicle configs
       if (formData.type === 'TRANSFERS' && formData.vehicleConfigs && formData.vehicleConfigs.length > 0) {
         console.log('🚗 Using enhanced transfer package creation with vehicle configs...');
+        console.log('🚗 Vehicle configs:', formData.vehicleConfigs);
+        console.log('🚗 Vehicle configs length:', formData.vehicleConfigs.length);
+        
         const { data: pkgInsert, error: pkgErr } = await packageService.createTransferPackageWithVehicles(
           mainInsert, 
-          formData.vehicleConfigs
+          formData.vehicleConfigs,
+          formData.image as File
         );
         
-        if (pkgErr) throw pkgErr;
+        if (pkgErr) {
+          console.error('❌ Transfer package creation error:', pkgErr);
+          console.error('❌ Transfer package creation error details:', JSON.stringify(pkgErr, null, 2));
+          throw pkgErr;
+        }
         console.log('✅ Transfer package with vehicles created successfully:', pkgInsert);
+      } else if (formData.type === 'ACTIVITY') {
+        console.log('🎯 Using activity package creation service...');
+        console.log('🎯 Activity variants:', formData.variants);
+        
+        const { ActivityPackageService } = await import('@/lib/services/ActivityPackageService');
+        const result = await ActivityPackageService.createActivityPackage(
+          tourOperator.id,
+          formData as any,
+          formData.image as File,
+          status
+        );
+        
+        if (!result.success) {
+          console.error('❌ Activity package creation error:', result.error);
+          throw new Error(result.error);
+        }
+        console.log('✅ Activity package created successfully:', result.packageId);
       } else {
         console.log('💾 Inserting main package...');
         const { data: pkgInsert, error: pkgErr } = await supabase
@@ -2537,6 +2654,24 @@ function CompactPackageWizardContent() {
           throw new Error('Package was not created. No ID returned from database.');
         }
         console.log('✅ Package ID obtained:', packageId);
+
+        // Upload and save image if provided
+        if (formData.image && formData.image instanceof File) {
+          console.log('📸 Uploading package image...');
+          const { ImageService } = await import('@/lib/services/imageService');
+          const imageResult = await ImageService.uploadAndSavePackageImage(
+            formData.image, 
+            packageId, 
+            true, // isPrimary
+            0 // order
+          );
+          
+          if (!imageResult.success) {
+            console.warn('⚠️ Image upload failed, but package was created:', imageResult.error);
+          } else {
+            console.log('✅ Package image uploaded successfully:', imageResult.url);
+          }
+        }
 
         // Verify insert exists (defensive check vs RLS or triggers)
         console.log('🔍 Verifying package exists...');
@@ -2562,8 +2697,32 @@ function CompactPackageWizardContent() {
       
     } catch (error: any) {
       console.error('💥 CRITICAL ERROR in package save:', error);
+      console.error('🔍 Error details:', {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        stack: error?.stack,
+        formData: formData,
+        status: status,
+        type: formData.type
+      });
+      
+      // Check if it's a specific database error
+      if (error?.code) {
+        console.error('🗄️ Database error code:', error.code);
+        if (error.code === '23505') {
+          console.error('🔑 Unique constraint violation - duplicate key');
+        } else if (error.code === '23503') {
+          console.error('🔗 Foreign key constraint violation');
+        } else if (error.code === '42501') {
+          console.error('🔒 Permission denied - RLS policy issue');
+        }
+      }
+      
       addToast(error?.message || 'Error saving package. Please try again.', 'error');
     } finally {
+      console.log('🏁 Package save process completed');
       setIsSaving(false);
     }
   };
@@ -2573,7 +2732,7 @@ function CompactPackageWizardContent() {
       case PackageType.TRANSFERS:
         return <TransferForm data={formData} onChange={updateFormData} errors={errors} />;
       case PackageType.ACTIVITY:
-        return <ActivityForm data={formData} onChange={updateFormData} />;
+        return <ActivityPackageForm data={formData} onChange={updateFormData} errors={errors} />;
       case PackageType.MULTI_CITY_PACKAGE:
         return <MultiCityPackageForm data={formData} onChange={updateFormData} />;
       case PackageType.MULTI_CITY_PACKAGE_WITH_HOTEL:
@@ -2663,7 +2822,15 @@ function CompactPackageWizardContent() {
                     <div className="flex gap-3">
                       {/* Save Draft Button */}
                       <button
-                        onClick={() => handleSave('DRAFT')}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log('🖱️ SAVE DRAFT BUTTON CLICKED');
+                          console.log('📋 Current form data:', formData);
+                          console.log('🔍 Current errors:', errors);
+                          console.log('🔍 Button disabled?', isSaving);
+                          handleSave('DRAFT');
+                        }}
                         disabled={isSaving}
                         className="relative flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm"
                         style={{
@@ -2685,12 +2852,22 @@ function CompactPackageWizardContent() {
 
                       {/* Submit/Publish Button */}
                       <button
-                        onClick={() => handleSave('ACTIVE')}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log('🖱️ SUBMIT & PUBLISH BUTTON CLICKED');
+                          console.log('📋 Current form data:', formData);
+                          console.log('🔍 Current errors:', errors);
+                          console.log('🔍 Button disabled?', isSaving);
+                          handleSave('ACTIVE');
+                        }}
                         disabled={isSaving}
                         className="relative flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm"
                         style={{
                           boxShadow: '0 6px 24px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
                         }}
+                        onMouseDown={() => console.log('🖱️ SUBMIT BUTTON MOUSE DOWN')}
+                        onMouseUp={() => console.log('🖱️ SUBMIT BUTTON MOUSE UP')}
                       >
                         {isSaving ? (
                           <>
@@ -3037,9 +3214,27 @@ const VehicleConfigurationSection = ({
 
 // Main wizard component with ToastProvider wrapper
 export default function CompactPackageWizard() {
+  console.log('🚀🚀🚀 COMPACT PACKAGE WIZARD LOADED 🚀🚀🚀');
+  console.log('🚀🚀🚀 THIS SHOULD APPEAR IN CONSOLE 🚀🚀🚀');
+  
+  // Add a simple test div to confirm rendering
   return (
+    <div>
+      <div style={{ 
+        position: 'fixed', 
+        top: '10px', 
+        right: '10px', 
+        background: 'red', 
+        color: 'white', 
+        padding: '10px', 
+        zIndex: 9999,
+        fontSize: '12px'
+      }}>
+        WIZARD LOADED ✅
+      </div>
     <ToastProvider>
       <CompactPackageWizardContent />
     </ToastProvider>
+    </div>
   );
 }

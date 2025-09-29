@@ -150,7 +150,14 @@ export default memo(function PackageCard({ package: pkg, viewMode }: PackageCard
   const handleAction = useCallback((action: string) => {
     switch (action) {
       case 'edit':
-        window.location.href = `/operator/packages/edit?id=${pkg.id}`;
+        console.log('🚀 Edit action clicked for package:', pkg.id, 'type:', pkg.type);
+        if (pkg.type === 'TRANSFERS') {
+          console.log('🚀 Redirecting to transfers edit page');
+          window.location.href = `/operator/packages/transfers/edit?id=${pkg.id}`;
+        } else {
+          console.log('🚀 Redirecting to regular edit page');
+          window.location.href = `/operator/packages/edit?id=${pkg.id}`;
+        }
         break;
       case 'duplicate':
         window.location.href = `/operator/packages/create?duplicate=${pkg.id}`;
