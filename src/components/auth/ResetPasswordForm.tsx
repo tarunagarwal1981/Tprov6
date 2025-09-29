@@ -124,7 +124,7 @@ export function ResetPasswordForm() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-white py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -137,7 +137,7 @@ export function ResetPasswordForm() {
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.1 }}
-                  className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                  className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4"
                 >
                   <CheckCircle2 className="w-8 h-8 text-white" />
                 </motion.div>
@@ -164,7 +164,7 @@ export function ResetPasswordForm() {
 
                 <Button
                   onClick={() => router.push('/auth/login')}
-                  className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                  className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
                 >
                   Go to sign in
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -178,7 +178,7 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-white py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -191,7 +191,7 @@ export function ResetPasswordForm() {
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.1 }}
-                className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4"
               >
                 <Lock className="w-8 h-8 text-white" />
               </motion.div>
@@ -320,7 +320,7 @@ export function ResetPasswordForm() {
                 <Button
                   type="submit"
                   disabled={isSubmitting || isLoading}
-                  className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
                 >
                   {isSubmitting || isLoading ? (
                     <>

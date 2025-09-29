@@ -51,26 +51,67 @@ export function ImprovedProtectedRoute({
   const effectRunCountRef = useRef(0);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // ===== AUTH STATE TRACKING =====
+  const currentAuthState = `${authState.isInitialized}-${authState.isLoading}-${authState.isAuthenticated}-${authState.user?.id}`;
+  
+  // ===== TIMEOUT CLEANUP HELPER =====
+  const clearLoadingTimeout = useCallback((reason: string) => {
+    if (loadingTimeoutRef.current) {
+      console.log(`🧹 ProtectedRoute: Clearing timeout - ${reason}, ID:`, loadingTimeoutRef.current);
+      clearTimeout(loadingTimeoutRef.current);
+      loadingTimeoutRef.current = null;
+      console.log('✅ ProtectedRoute: Timeout cleared successfully');
+    } else {
+      console.log(`ℹ️ ProtectedRoute: No timeout to clear - ${reason}`);
+    }
+  }, []);
+
   // ===== CLIENT-SIDE HYDRATION =====
   useEffect(() => {
     setIsClient(true);
     
+    console.log('⏰ ProtectedRoute: Setting loading timeout (5s)');
+    
     // Set a safety timeout to prevent infinite loading
     loadingTimeoutRef.current = setTimeout(() => {
       console.warn('🚨 ProtectedRoute: Loading timeout reached, forcing no loading state');
+      console.log('🔍 Timeout Debug Info:', {
+        isInitialized: authState.isInitialized,
+        isLoading: authState.isLoading,
+        isAuthenticated: authState.isAuthenticated,
+        hasUser: !!authState.user,
+        userRole: authState.user?.role,
+        pathname,
+        effectRunCount: effectRunCountRef.current,
+        hasRedirected,
+        forceNoLoading,
+        timeoutId: loadingTimeoutRef.current,
+      });
       setForceNoLoading(true);
-    }, 15000); // 15 second timeout
+    }, 5000); // Reduced to 5 seconds for better UX
+    
+    console.log('⏰ ProtectedRoute: Timeout set with ID:', loadingTimeoutRef.current);
     
     return () => {
-      if (loadingTimeoutRef.current) {
-        clearTimeout(loadingTimeoutRef.current);
-        loadingTimeoutRef.current = null;
-      }
+      clearLoadingTimeout('initial cleanup');
     };
-  }, []);
-
-  // ===== AUTH STATE TRACKING =====
-  const currentAuthState = `${authState.isInitialized}-${authState.isLoading}-${authState.isAuthenticated}-${authState.user?.id}`;
+  }, [clearLoadingTimeout]);
+  
+  // ===== TIMEOUT CLEANUP ON AUTH RESOLUTION =====
+  useEffect(() => {
+    console.log('🔍 ProtectedRoute: Auth state changed, checking timeout cleanup:', {
+      isInitialized: authState.isInitialized,
+      hasUser: !!authState.user,
+      isLoading: authState.isLoading,
+      timeoutExists: !!loadingTimeoutRef.current,
+      timeoutId: loadingTimeoutRef.current,
+    });
+    
+    // Clear timeout if we have a resolved auth state
+    if (authState.isInitialized && authState.user && !authState.isLoading) {
+      clearLoadingTimeout('auth resolved with user');
+    }
+  }, [authState.isInitialized, authState.user, authState.isLoading]);
   
   // ===== REDIRECT LOGIC =====
   const handleRedirect = useCallback((targetPath: string) => {
@@ -90,8 +131,8 @@ export function ImprovedProtectedRoute({
   useEffect(() => {
     effectRunCountRef.current += 1;
     
-    // Circuit breaker
-    if (effectRunCountRef.current > 5) {
+    // Circuit breaker - more aggressive
+    if (effectRunCountRef.current > 3) {
       console.error('🚨 ProtectedRoute: Too many effect runs, breaking');
       return;
     }
@@ -115,6 +156,18 @@ export function ImprovedProtectedRoute({
     }
 
     lastAuthStateRef.current = currentAuthState;
+    
+    // Reset effect run count when auth state actually changes
+    if (effectRunCountRef.current > 0) {
+      console.log('🔄 ProtectedRoute: Auth state changed, resetting effect run count');
+      effectRunCountRef.current = 0;
+    }
+
+    // Force exit loading state if we've been loading too long
+    if (authState.isLoading && effectRunCountRef.current > 3) {
+      console.warn('🚨 ProtectedRoute: Loading state persisted too long, forcing exit');
+      setForceNoLoading(true);
+    }
 
     console.log('🛡️ ProtectedRoute: Processing auth state:', {
       isInitialized: authState.isInitialized,
@@ -139,6 +192,8 @@ export function ImprovedProtectedRoute({
     // Case 1.1: We have a user but isAuthenticated is false (inconsistent state)
     if (authState.user && !authState.isAuthenticated) {
       console.log('⚠️ ProtectedRoute: User exists but isAuthenticated is false, allowing access');
+      // Clear timeout since we have a user
+      clearLoadingTimeout('user exists');
       // Continue with user access - this is a valid state
     }
 
@@ -169,6 +224,8 @@ export function ImprovedProtectedRoute({
     // Case 2: No role requirements
     if (!requiredRoles || requiredRoles.length === 0) {
       console.log('✅ ProtectedRoute: No role requirements, allowing access');
+      // Clear timeout since we're allowing access
+      clearLoadingTimeout('no role requirements');
       return;
     }
 
@@ -193,6 +250,11 @@ export function ImprovedProtectedRoute({
 
     // Case 4: All checks passed
     console.log('✅ ProtectedRoute: All checks passed, allowing access');
+    console.log('🧹 ProtectedRoute: Clearing timeout since auth is resolved');
+    
+    // Clear the loading timeout since we're now authenticated
+    clearLoadingTimeout('all checks passed');
+    
     redirectAttemptedRef.current = false; // Reset for potential future redirects
     
   }, [
@@ -220,6 +282,13 @@ export function ImprovedProtectedRoute({
     }
   }, [pathname, redirectPath]);
 
+  // ===== CLEANUP ON UNMOUNT =====
+  useEffect(() => {
+    return () => {
+      clearLoadingTimeout('component unmounting');
+    };
+  }, []);
+
   // ===== RENDER LOGIC =====
   
   // Show loading during client-side hydration
@@ -233,6 +302,12 @@ export function ImprovedProtectedRoute({
 
   // Show loading while auth is initializing (unless forced to exit)
   if ((!authState.isInitialized || authState.isLoading) && !forceNoLoading) {
+    console.log('🔄 ProtectedRoute: Showing loading spinner', {
+      isInitialized: authState.isInitialized,
+      isLoading: authState.isLoading,
+      forceNoLoading,
+      hasUser: !!authState.user,
+    });
     return loadingComponent || (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" text="Loading..." />
@@ -318,6 +393,14 @@ export function ImprovedProtectedRoute({
   }
 
   // Render children if all checks pass
+  console.log('🎉 ProtectedRoute: Rendering children successfully', {
+    isInitialized: authState.isInitialized,
+    isLoading: authState.isLoading,
+    isAuthenticated: authState.isAuthenticated,
+    hasUser: !!authState.user,
+    userRole: authState.user?.role,
+    pathname,
+  });
   return <>{children}</>;
 }
 

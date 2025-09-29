@@ -17,7 +17,11 @@ import {
   Plus,
   Heart,
   Share2,
-  TrendingUp
+  TrendingUp,
+  Car,
+  ChevronDown,
+  ChevronUp,
+  Check
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,6 +29,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { agentService } from '@/lib/services/agentService';
 import { PackageWithStats } from '@/lib/types/agent';
+import { VehicleConfig } from '@/lib/types';
 
 // Define roles outside component to prevent re-creation on every render
 const AGENT_ROLES = [UserRole.TRAVEL_AGENT];
@@ -34,6 +39,8 @@ function PackagesPage() {
   const [packages, setPackages] = React.useState<PackageWithStats[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [expandedPackages, setExpandedPackages] = React.useState<Set<string>>(new Set());
+  const [selectedVehicles, setSelectedVehicles] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
     loadPackages();
@@ -59,16 +66,30 @@ function PackagesPage() {
     pkg.operatorName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const togglePackageExpansion = (packageId: string) => {
+    const newExpanded = new Set(expandedPackages);
+    if (newExpanded.has(packageId)) {
+      newExpanded.delete(packageId);
+    } else {
+      newExpanded.add(packageId);
+    }
+    setExpandedPackages(newExpanded);
+  };
+
+  const handleVehicleSelection = (packageId: string, vehicleId: string) => {
+    setSelectedVehicles(prev => ({
+      ...prev,
+      [packageId]: vehicleId
+    }));
+  };
+
+  const getSelectedVehicle = (packageId: string, vehicleConfigs: VehicleConfig[]) => {
+    const selectedId = selectedVehicles[packageId];
+    return vehicleConfigs.find(v => v.id === selectedId) || vehicleConfigs[0];
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-purple-100 relative overflow-hidden">
-      {/* Bright animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 -right-32 w-96 h-96 bg-gradient-to-br from-blue-400/40 to-purple-500/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-gradient-to-br from-indigo-500/30 to-pink-500/40 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-gradient-to-br from-emerald-400/25 to-cyan-500/25 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/4 left-1/3 w-72 h-72 bg-gradient-to-br from-yellow-300/20 to-orange-400/25 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '3s' }} />
-        <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-gradient-to-br from-violet-400/15 to-fuchsia-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
-      </div>
+    <div className="min-h-screen bg-white relative overflow-hidden">
       
       {/* Enhanced Header */}
       <div className="relative z-10 backdrop-blur-xl border-b border-white/40"
@@ -216,6 +237,85 @@ function PackagesPage() {
                     </div>
                   </div>
                   
+                  {/* Vehicle Options for Transfer Packages */}
+                  {pkg.type === 'TRANSFERS' && (pkg as any).vehicleConfigs && (pkg as any).vehicleConfigs.length > 0 && (
+                    <div className="pt-4 border-t border-white/20">
+                      <button
+                        onClick={() => togglePackageExpansion(pkg.id)}
+                        className="flex items-center justify-between w-full p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Car className="h-4 w-4 text-blue-600" />
+                          <span className="text-sm font-medium text-gray-900">
+                            Vehicle Options ({(pkg as any).vehicleConfigs.length})
+                          </span>
+                        </div>
+                        {expandedPackages.has(pkg.id) ? (
+                          <ChevronUp className="h-4 w-4 text-gray-600" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 text-gray-600" />
+                        )}
+                      </button>
+                      
+                      {expandedPackages.has(pkg.id) && (
+                        <div className="mt-3 space-y-2">
+                          {(pkg as any).vehicleConfigs.map((vehicle: VehicleConfig) => {
+                            const isSelected = selectedVehicles[pkg.id] === vehicle.id;
+                            return (
+                              <label
+                                key={vehicle.id}
+                                className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                                  isSelected 
+                                    ? 'border-blue-500 bg-blue-50' 
+                                    : 'border-gray-200 hover:border-gray-300'
+                                }`}
+                              >
+                                <input
+                                  type="radio"
+                                  name={`vehicle-${pkg.id}`}
+                                  value={vehicle.id}
+                                  checked={isSelected}
+                                  onChange={() => handleVehicleSelection(pkg.id, vehicle.id || '')}
+                                  className="text-blue-600"
+                                />
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <h4 className="font-medium text-gray-900">{vehicle.name}</h4>
+                                      <p className="text-sm text-gray-600">
+                                        {vehicle.vehicleType} • {vehicle.minPassengers}-{vehicle.maxPassengers} passengers
+                                      </p>
+                                    </div>
+                                    <div className="text-right">
+                                      <div className="font-semibold text-gray-900">₹{vehicle.basePrice}</div>
+                                      {vehicle.perKmRate && (
+                                        <div className="text-xs text-gray-500">+ ₹{vehicle.perKmRate}/km</div>
+                                      )}
+                                    </div>
+                                  </div>
+                                  {vehicle.features.length > 0 && (
+                                    <div className="flex flex-wrap gap-1 mt-2">
+                                      {vehicle.features.slice(0, 3).map((feature) => (
+                                        <Badge key={feature} variant="secondary" className="text-xs">
+                                          {feature}
+                                        </Badge>
+                                      ))}
+                                      {vehicle.features.length > 3 && (
+                                        <Badge variant="secondary" className="text-xs">
+                                          +{vehicle.features.length - 3} more
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Actions */}
                   <div className="flex items-center justify-between pt-4 border-t border-white/20">
                     <div className="flex space-x-2">
@@ -231,9 +331,16 @@ function PackagesPage() {
                         <Eye className="h-4 w-4 mr-1" />
                         View
                       </Button>
-                      <Button size="sm" disabled={!pkg.availability} className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
+                      <Button 
+                        size="sm" 
+                        disabled={!pkg.availability} 
+                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                      >
                         <Plus className="h-4 w-4 mr-1" />
-                        Add to Itinerary
+                        {pkg.type === 'TRANSFERS' && (pkg as any).vehicleConfigs?.length > 0 
+                          ? `Add (₹${getSelectedVehicle(pkg.id, (pkg as any).vehicleConfigs).basePrice})`
+                          : 'Add to Itinerary'
+                        }
                       </Button>
                     </div>
                   </div>

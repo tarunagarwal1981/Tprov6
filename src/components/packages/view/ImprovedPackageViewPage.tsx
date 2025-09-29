@@ -266,7 +266,15 @@ export default function ImprovedPackageViewPage() {
   }, [packageId]);
 
   const handleEdit = () => {
+    console.log('🚀 Edit button clicked for package ID:', packageId);
+    console.log('🚀 Package type:', packageData?.type);
+    if (packageData?.type === 'TRANSFERS') {
+      console.log('🚀 Redirecting to transfers edit page');
+      router.push(`/operator/packages/transfers/edit?id=${packageId}`);
+    } else {
+      console.log('🚀 Redirecting to regular edit page');
     router.push(`/operator/packages/edit?id=${packageId}`);
+    }
   };
 
   const handleBack = () => {
@@ -414,6 +422,10 @@ export default function ImprovedPackageViewPage() {
                   <DetailField label="Place/Destination" value={packageData.place} icon={MapPin} />
                   <DetailField label="From Location" value={packageData.from_location} />
                   <DetailField label="To Location" value={packageData.to_location} />
+                  <DetailField label="Service Type" value={packageData.transfer_service_type?.replace(/_/g, ' ')} />
+                  <DetailField label="Distance" value={packageData.distance_km ? `${packageData.distance_km} km` : undefined} />
+                  <DetailField label="Estimated Duration" value={packageData.estimated_duration} />
+                  <DetailField label="Advance Booking Required" value={packageData.advance_booking_hours ? `${packageData.advance_booking_hours} hours` : undefined} />
                 </div>
               </InfoCard>
             )}

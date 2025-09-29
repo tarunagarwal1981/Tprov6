@@ -31,7 +31,7 @@ function FeatureCard({ title, description, icon, features, delay = 0, gradient }
         transition: { duration: 0.2 }
       }}
     >
-      <div className={`w-16 h-16 ${gradient} rounded-xl flex items-center justify-center text-white mb-6`}>
+      <div className={`w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center text-white mb-6`}>
         {icon}
       </div>
       
@@ -75,7 +75,7 @@ export function Features() {
         'Real-time insights',
         'Custom AI models'
       ],
-      gradient: 'bg-gradient-to-br from-blue-500 to-blue-600',
+      gradient: 'bg-blue-600',
       delay: 0
     },
     {
@@ -93,7 +93,7 @@ export function Features() {
         'Photo & video galleries',
         'Booking automation'
       ],
-      gradient: 'bg-gradient-to-br from-purple-500 to-purple-600',
+      gradient: 'bg-purple-600',
       delay: 0.2
     },
     {
@@ -111,7 +111,7 @@ export function Features() {
         'Local expertise access',
         'Collaborative tools'
       ],
-      gradient: 'bg-gradient-to-br from-green-500 to-green-600',
+      gradient: 'bg-green-600',
       delay: 0.4
     }
   ];

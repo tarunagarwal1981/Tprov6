@@ -242,7 +242,7 @@ export function RecentActivity({ className }: RecentActivityProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.6 }}
-          className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4"
+          className="bg-gray-50 rounded-lg p-4"
         >
           <div className="flex items-center justify-between">
             <div>

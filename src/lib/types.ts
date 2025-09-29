@@ -6,6 +6,24 @@ export enum UserRole {
   TRAVEL_AGENT = 'TRAVEL_AGENT',
 }
 
+// ===== TRANSFER SYSTEM ENUMS =====
+export enum VehicleType {
+  SEDAN = 'SEDAN',
+  SUV = 'SUV',
+  HATCHBACK = 'HATCHBACK',
+  LUXURY_SEDAN = 'LUXURY_SEDAN',
+  TEMPO_TRAVELLER = 'TEMPO_TRAVELLER',
+  BUS = 'BUS',
+  CUSTOM = 'CUSTOM'
+}
+
+export enum TransferServiceType {
+  POINT_TO_POINT = 'POINT_TO_POINT',
+  AIRPORT_TRANSFER = 'AIRPORT_TRANSFER',
+  CITY_TOUR = 'CITY_TOUR',
+  HOURLY_RENTAL = 'HOURLY_RENTAL'
+}
+
 // ===== USER INTERFACES =====
 export interface User {
   id: string;
@@ -165,6 +183,32 @@ export interface Package {
   reviewCount?: number;
   createdAt: Date;
   updatedAt: Date;
+  
+  // Activity-specific fields
+  activityCategory?: string;
+  availableDays?: string[];
+  operationalHours?: OperationalHours;
+  meetingPoint?: string;
+  emergencyContact?: EmergencyContact;
+  transferOptions?: string[];
+  maxCapacity?: number;
+  languagesSupported?: string[];
+  accessibilityInfo?: string[];
+  ageRestrictions?: AgeRestrictions;
+  importantInfo?: string;
+  faq?: FAQ[];
+  variants?: PackageVariant[];
+  
+  // Transfer-specific fields
+  transferServiceType?: TransferServiceType;
+  distanceKm?: number;
+  estimatedDuration?: string;
+  advanceBookingHours?: number;
+  cancellationPolicyText?: string;
+  vehicleConfigs?: VehicleConfig[];
+  pickupPoints?: PickupPoint[];
+  dropoffPoints?: PickupPoint[];
+  additionalServices?: AdditionalService[];
 }
 
 export interface PackagePricing {
@@ -542,6 +586,157 @@ export const TIMEZONES = [
 export type Currency = typeof CURRENCIES[number];
 export type Language = typeof LANGUAGES[number];
 export type Timezone = typeof TIMEZONES[number];
+
+// ===== ACTIVITY PACKAGE SPECIFIC INTERFACES =====
+
+export interface OperationalHours {
+  startTime: string;
+  endTime: string;
+  timeSlots?: TimeSlot[];
+  operationalDays: string[];
+  breaks?: BreakPeriod[];
+}
+
+export interface TimeSlot {
+  id: string;
+  startTime: string;
+  endTime: string;
+  maxCapacity?: number;
+  isActive: boolean;
+}
+
+export interface BreakPeriod {
+  startTime: string;
+  endTime: string;
+  reason: string;
+}
+
+export interface EmergencyContact {
+  name: string;
+  phone: string;
+  email: string;
+  availableHours: string;
+  languages: string[];
+}
+
+export interface AgeRestrictions {
+  minAge?: number;
+  maxAge?: number;
+  childPolicy: string;
+  infantPolicy: string;
+  seniorPolicy?: string;
+  ageVerificationRequired: boolean;
+}
+
+export interface FAQ {
+  id: string;
+  question: string;
+  answer: string;
+  category?: string;
+  order: number;
+}
+
+export interface PackageVariant {
+  id: string;
+  packageId: string;
+  variantName: string;
+  description?: string;
+  inclusions: string[];
+  exclusions: string[];
+  priceAdult: number;
+  priceChild: number;
+  priceInfant: number;
+  minGuests: number;
+  maxGuests?: number;
+  isActive: boolean;
+  orderIndex: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Activity Categories
+export enum ActivityCategory {
+  SIGHTSEEING = 'SIGHTSEEING',
+  AQUARIUM = 'AQUARIUM',
+  FAMILY = 'FAMILY',
+  ADVENTURE = 'ADVENTURE',
+  CULTURAL = 'CULTURAL',
+  EDUCATIONAL = 'EDUCATIONAL',
+  ENTERTAINMENT = 'ENTERTAINMENT',
+  NATURE = 'NATURE',
+  SPORTS = 'SPORTS',
+  FOOD = 'FOOD',
+  SHOPPING = 'SHOPPING',
+  RELAXATION = 'RELAXATION',
+  NIGHTLIFE = 'NIGHTLIFE',
+  RELIGIOUS = 'RELIGIOUS',
+  HISTORICAL = 'HISTORICAL',
+  ART = 'ART',
+  MUSIC = 'MUSIC',
+  THEME_PARK = 'THEME_PARK',
+  ZOO = 'ZOO',
+  MUSEUM = 'MUSEUM',
+  OTHER = 'OTHER'
+}
+
+// Transfer Options
+export enum TransferOption {
+  TICKET_ONLY = 'TICKET_ONLY',
+  PRIVATE_TRANSFER = 'PRIVATE_TRANSFER',
+  SHARED_TRANSFER = 'SHARED_TRANSFER',
+  PUBLIC_TRANSPORT = 'PUBLIC_TRANSPORT',
+  WALKING_DISTANCE = 'WALKING_DISTANCE',
+  HOTEL_PICKUP = 'HOTEL_PICKUP',
+  AIRPORT_PICKUP = 'AIRPORT_PICKUP',
+  CUSTOM_LOCATION = 'CUSTOM_LOCATION'
+}
+
+// ===== TRANSFER SYSTEM INTERFACES =====
+export interface VehicleConfig {
+  id?: string;
+  vehicleType: VehicleType | string; // Allow custom types
+  name: string;
+  minPassengers: number;
+  maxPassengers: number;
+  basePrice: number;
+  perKmRate?: number;
+  perHourRate?: number;
+  features: string[];
+  description?: string;
+  images?: string[];
+  isActive: boolean;
+  orderIndex: number;
+  transferType?: 'ONEWAY' | 'TWOWAY';
+}
+
+export interface PickupPoint {
+  id?: string;
+  name: string;
+  address: string;
+  coordinates?: { lat: number; lng: number };
+  landmarkNotes?: string;
+  isActive: boolean;
+}
+
+export interface AdditionalService {
+  id?: string;
+  name: string;
+  price: number;
+  description?: string;
+  isOptional: boolean;
+  isActive: boolean;
+}
+
+// Days of Week
+export enum DayOfWeek {
+  MONDAY = 'MONDAY',
+  TUESDAY = 'TUESDAY',
+  WEDNESDAY = 'WEDNESDAY',
+  THURSDAY = 'THURSDAY',
+  FRIDAY = 'FRIDAY',
+  SATURDAY = 'SATURDAY',
+  SUNDAY = 'SUNDAY'
+}
 
 // Re-export wizard types
 export * from './types/wizard';

@@ -247,15 +247,7 @@ function LeadsMarketplacePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-purple-100 relative overflow-hidden">
-      {/* Bright animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 -right-32 w-96 h-96 bg-gradient-to-br from-blue-400/40 to-purple-500/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-gradient-to-br from-indigo-500/30 to-pink-500/40 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-gradient-to-br from-emerald-400/25 to-cyan-500/25 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/4 left-1/3 w-72 h-72 bg-gradient-to-br from-yellow-300/20 to-orange-400/25 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '3s' }} />
-        <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-gradient-to-br from-violet-400/15 to-fuchsia-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
-      </div>
+    <div className="min-h-screen bg-white relative overflow-hidden">
       
       {/* Enhanced Header */}
       <div className="relative z-10 backdrop-blur-xl border-b border-white/40"
@@ -267,7 +259,7 @@ function LeadsMarketplacePage() {
           <div className="py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center backdrop-blur-sm"
+                <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center backdrop-blur-sm"
                 style={{
                   boxShadow: '0 8px 25px rgba(34,197,94,0.3), inset 0 2px 4px rgba(255,255,255,0.7)'
                 }}>
@@ -379,7 +371,7 @@ function LeadsMarketplacePage() {
               }}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-semibold backdrop-blur-sm">
+                    <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-semibold backdrop-blur-sm">
                       {lead.customerName.charAt(0)}
                     </div>
                     <div>
@@ -467,7 +459,7 @@ function LeadsMarketplacePage() {
                     </Button>
                     <Button 
                       size="sm" 
-                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                      className="bg-green-600 hover:bg-green-700"
                       onClick={() => handlePurchaseLead(lead.id)}
                       disabled={lead.status === 'PURCHASED'}
                     >
