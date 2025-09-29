@@ -7,9 +7,9 @@ import { FormField } from '@/components/packages/forms/FormField';
 import { Input } from '@/components/packages/forms/Input';
 import { Textarea } from '@/components/packages/forms/Textarea';
 import { Select } from '@/components/packages/forms/Select';
-import { CitySearchInput } from '@/components/packages/create/CitySearchInput';
+import CitySearchInput from '@/components/packages/create/CitySearchInput';
 import { ImageUpload } from '@/components/packages/forms/ImageUpload';
-import { VehicleConfigurationSection } from '@/components/packages/forms/VehicleConfigurationSection';
+// import { VehicleConfigurationSection } from '@/components/packages/forms/VehicleConfigurationSection';
 
 export interface TransfersFormData {
   // Basic Info
@@ -218,10 +218,11 @@ export function TransfersPackageForm({
 
   const renderVehicleOptions = () => (
     <div className="space-y-6">
-      <VehicleConfigurationSection
-        vehicleConfigs={data.vehicleConfigs || []}
-        onChange={(vehicleConfigs) => onChange({ vehicleConfigs })}
-      />
+      <div className="text-center py-8 text-gray-500">
+        <Car className="w-12 h-12 mx-auto mb-4 opacity-50" />
+        <h3 className="text-lg font-medium mb-2">Vehicle Configuration</h3>
+        <p className="text-sm">Vehicle configuration section will be implemented here</p>
+      </div>
       {errors.vehicleConfigs && (
         <div className="text-red-600 text-sm mt-2 p-3 bg-red-50 rounded-lg border border-red-200">
           {errors.vehicleConfigs}
